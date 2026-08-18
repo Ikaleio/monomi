@@ -1,0 +1,151 @@
+import i18n, { type InitOptions } from "i18next"
+import { initReactI18next } from "react-i18next"
+
+export const locales = ["zh-CN", "en", "ja"] as const
+export type Locale = (typeof locales)[number]
+
+const zh = {
+  language: "语言",
+  chinese: "简体中文",
+  english: "English",
+  japanese: "日本語",
+  theme: "主题模式",
+  light: "浅色",
+  dark: "深色",
+  system: "跟随系统",
+  logout: "退出",
+  overview: "总览",
+  monitors: "监视器",
+  incidents: "故障记录",
+  notifications: "通知",
+  statusPage: "状态页",
+  settings: "设置",
+  runtimeCenter: "运行中心",
+  reload: "重新加载",
+  refresh: "刷新",
+  save: "保存",
+  cancel: "取消",
+  delete: "删除",
+  edit: "编辑",
+  copy: "复制",
+  enabled: "启用",
+  paused: "已暂停",
+  operational: "运行正常",
+  degraded: "性能下降",
+  outage: "服务中断",
+  pending: "等待检查",
+  maintenance: "计划维护",
+  noData: "暂无数据",
+  loading: "正在加载…",
+  requestFailed: "请求失败，请稍后重试。",
+  createMonitor: "新建监视器",
+  allMonitors: "全部监视器",
+  monitorDescription: "管理 HTTP、TCP 和 Heartbeat 检测目标。",
+  noMonitors: "还没有监视器",
+  createFirstMonitor: "创建第一个监视器开始检测。",
+  checks: "检查",
+  recentChecks: "最近检查",
+  latency: "延迟",
+  result: "结果",
+  details: "详情",
+  success: "成功",
+  failed: "失败",
+  noChecks: "暂无检查记录",
+  immediateCheck: "立即检测",
+  resume: "恢复",
+  all: "全部",
+  ongoing: "进行中",
+  resolved: "已解决",
+  durationSeconds: "持续 {{count}} 秒",
+  incidentTimeline: "事件时间线",
+  noIncidents: "没有匹配的故障",
+  noIncidentsDescription: "当前筛选范围内没有事件。",
+  loginTitle: "欢迎回来",
+  loginDescription: "登录以管理监视器、事件和公开状态页。",
+  username: "用户名",
+  password: "密码",
+  login: "登录",
+  loggingIn: "正在登录",
+  setupTitle: "创建管理员",
+  setupDescription: "这是一次性设置。Monomi 仅支持一个本地管理员账户。",
+  confirmPassword: "确认密码",
+  passwordMismatch: "两次输入的密码不一致",
+  createAdmin: "创建管理员并继续",
+  publicDisabled: "公开状态页尚未开启",
+  publicDisabledDescription: "管理员暂未公开 Monomi 的服务状态。",
+  publicUnavailable: "暂时无法读取状态",
+  publicUnavailableDescription: "公开状态页暂时不可用，请稍后重试。",
+  allSystemsOperational: "所有系统运行正常",
+  someDegraded: "部分服务性能下降",
+  someOutage: "部分服务中断",
+  collectingStatus: "正在收集状态",
+  serviceMaintenance: "服务处于维护状态",
+  allGoodTitle: "一切运行如常。",
+  attentionTitle: "部分服务需要关注。",
+  handlingOutageTitle: "我们正在处理故障。",
+  statusComingTitle: "状态数据即将到来。",
+  maintenanceTitle: "服务正在维护。",
+  availability: "实时可用性",
+  clearServices: "每一项服务，清晰可见",
+  last90Days: "最近 90 天",
+  eventRecords: "事件记录",
+  noRecentEvents: "近期无事件",
+  noRecentEventsDescription: "过去 90 天内没有故障记录。",
+  transparency: "透明、稳定、值得信赖",
+  updatedAt: "更新于 {{value}}",
+  monitorCount: "{{count}} 个监控项目",
+  overviewUnavailable: "总览暂时不可用",
+  coreStats: "核心统计",
+  attention: "需要关注",
+  noAttention: "无需处理",
+  noAttentionDescription: "当前没有需要人工关注的项目。",
+  webhookChannels: "Webhook 渠道",
+  addChannel: "添加渠道",
+  sendTest: "发送测试",
+  publicSettings: "公开状态页设置",
+  general: "常规",
+  retention: "保留周期",
+  account: "管理员账户",
+  backupRestore: "备份与恢复",
+  importExport: "配置导入导出",
+  saveChanges: "保存更改",
+  saving: "正在保存",
+  virtualized: "列表使用虚拟滚动以保持流畅。",
+} as const
+
+type TranslationShape = Record<keyof typeof zh, string>
+
+const en: TranslationShape = {
+  language: "Language", chinese: "简体中文", english: "English", japanese: "日本語", theme: "Theme", light: "Light", dark: "Dark", system: "System", logout: "Log out", overview: "Overview", monitors: "Monitors", incidents: "Incidents", notifications: "Notifications", statusPage: "Status page", settings: "Settings", runtimeCenter: "Operations", reload: "Reload", refresh: "Refresh", save: "Save", cancel: "Cancel", delete: "Delete", edit: "Edit", copy: "Copy", enabled: "Enabled", paused: "Paused", operational: "Operational", degraded: "Degraded", outage: "Outage", pending: "Pending", maintenance: "Maintenance", noData: "No data", loading: "Loading…", requestFailed: "Request failed. Try again later.", createMonitor: "New monitor", allMonitors: "All monitors", monitorDescription: "Manage HTTP, TCP, and heartbeat targets.", noMonitors: "No monitors yet", createFirstMonitor: "Create your first monitor to begin checking.", checks: "Checks", recentChecks: "Recent checks", latency: "Latency", result: "Result", details: "Details", success: "Success", failed: "Failed", noChecks: "No check records", immediateCheck: "Run now", resume: "Resume", all: "All", ongoing: "Ongoing", resolved: "Resolved", durationSeconds: "Duration: {{count}} seconds", incidentTimeline: "Incident timeline", noIncidents: "No matching incidents", noIncidentsDescription: "No incidents match this filter.", loginTitle: "Welcome back", loginDescription: "Sign in to manage monitors, incidents, and the public status page.", username: "Username", password: "Password", login: "Sign in", loggingIn: "Signing in", setupTitle: "Create administrator", setupDescription: "One-time setup. Monomi supports one local administrator.", confirmPassword: "Confirm password", passwordMismatch: "Passwords do not match", createAdmin: "Create administrator and continue", publicDisabled: "Public status page is disabled", publicDisabledDescription: "The administrator has not published service status.", publicUnavailable: "Status is temporarily unavailable", publicUnavailableDescription: "The public status page cannot be loaded. Try again later.", allSystemsOperational: "All systems operational", someDegraded: "Some services are degraded", someOutage: "Some services are unavailable", collectingStatus: "Collecting status", serviceMaintenance: "Services under maintenance", allGoodTitle: "Everything is running normally.", attentionTitle: "Some services need attention.", handlingOutageTitle: "We are handling an outage.", statusComingTitle: "Status data is on the way.", maintenanceTitle: "Services are under maintenance.", availability: "Live availability", clearServices: "Every service, clearly visible", last90Days: "Last 90 days", eventRecords: "Incident history", noRecentEvents: "No recent incidents", noRecentEventsDescription: "No failures were recorded in the last 90 days.", transparency: "Transparent, stable, trustworthy", updatedAt: "Updated {{value}}", monitorCount: "{{count}} monitored services", overviewUnavailable: "Overview unavailable", coreStats: "Core statistics", attention: "Needs attention", noAttention: "Nothing to handle", noAttentionDescription: "No items currently need manual attention.", webhookChannels: "Webhook channels", addChannel: "Add channel", sendTest: "Send test", publicSettings: "Public status settings", general: "General", retention: "Retention", account: "Administrator account", backupRestore: "Backup and restore", importExport: "Configuration transfer", saveChanges: "Save changes", saving: "Saving", virtualized: "This list uses virtualization to stay responsive.",
+}
+
+const ja: TranslationShape = {
+  language: "言語", chinese: "簡体字中国語", english: "English", japanese: "日本語", theme: "テーマ", light: "ライト", dark: "ダーク", system: "システム", logout: "ログアウト", overview: "概要", monitors: "モニター", incidents: "障害履歴", notifications: "通知", statusPage: "ステータスページ", settings: "設定", runtimeCenter: "運用センター", reload: "再読み込み", refresh: "更新", save: "保存", cancel: "キャンセル", delete: "削除", edit: "編集", copy: "コピー", enabled: "有効", paused: "一時停止", operational: "正常稼働", degraded: "性能低下", outage: "停止", pending: "確認待ち", maintenance: "メンテナンス", noData: "データなし", loading: "読み込み中…", requestFailed: "リクエストに失敗しました。後でもう一度お試しください。", createMonitor: "モニターを作成", allMonitors: "すべてのモニター", monitorDescription: "HTTP、TCP、Heartbeat の監視対象を管理します。", noMonitors: "モニターはまだありません", createFirstMonitor: "最初のモニターを作成してください。", checks: "チェック", recentChecks: "最近のチェック", latency: "遅延", result: "結果", details: "詳細", success: "成功", failed: "失敗", noChecks: "チェック履歴なし", immediateCheck: "今すぐ確認", resume: "再開", all: "すべて", ongoing: "対応中", resolved: "解決済み", durationSeconds: "継続 {{count}} 秒", incidentTimeline: "障害タイムライン", noIncidents: "該当する障害なし", noIncidentsDescription: "この条件に一致する障害はありません。", loginTitle: "おかえりなさい", loginDescription: "ログインしてモニター、障害、公開ページを管理します。", username: "ユーザー名", password: "パスワード", login: "ログイン", loggingIn: "ログイン中", setupTitle: "管理者を作成", setupDescription: "初回のみの設定です。Monomi はローカル管理者 1 名に対応します。", confirmPassword: "パスワード確認", passwordMismatch: "パスワードが一致しません", createAdmin: "管理者を作成して続行", publicDisabled: "公開ステータスページは無効です", publicDisabledDescription: "管理者はサービス状態を公開していません。", publicUnavailable: "状態を一時的に取得できません", publicUnavailableDescription: "公開ステータスページを読み込めません。後でもう一度お試しください。", allSystemsOperational: "すべて正常稼働", someDegraded: "一部サービスの性能が低下", someOutage: "一部サービスが停止", collectingStatus: "状態を収集中", serviceMaintenance: "メンテナンス中", allGoodTitle: "すべて正常に稼働しています。", attentionTitle: "確認が必要なサービスがあります。", handlingOutageTitle: "障害に対応しています。", statusComingTitle: "状態データを収集中です。", maintenanceTitle: "サービスをメンテナンス中です。", availability: "リアルタイム可用性", clearServices: "すべてのサービスを明確に", last90Days: "過去 90 日", eventRecords: "障害履歴", noRecentEvents: "最近の障害なし", noRecentEventsDescription: "過去 90 日に障害はありません。", transparency: "透明、安定、信頼", updatedAt: "更新 {{value}}", monitorCount: "{{count}} 件を監視", overviewUnavailable: "概要を取得できません", coreStats: "主要統計", attention: "要確認", noAttention: "対応不要", noAttentionDescription: "現在、手動対応が必要な項目はありません。", webhookChannels: "Webhook チャンネル", addChannel: "チャンネルを追加", sendTest: "テスト送信", publicSettings: "公開ページ設定", general: "一般", retention: "保持期間", account: "管理者アカウント", backupRestore: "バックアップと復元", importExport: "設定の移行", saveChanges: "変更を保存", saving: "保存中", virtualized: "仮想スクロールで快適に表示します。",
+}
+
+function localeFromCookie(): Locale {
+  if (typeof document === "undefined") return "zh-CN"
+  const value = document.cookie.split("; ").find((entry) => entry.startsWith("monomi_locale="))?.split("=")[1]
+  return locales.includes(value as Locale) ? (value as Locale) : "zh-CN"
+}
+
+const initialLocale = localeFromCookie()
+if (typeof document !== "undefined") document.documentElement.lang = initialLocale
+
+const initOptions: InitOptions = {
+  resources: { "zh-CN": { translation: zh }, en: { translation: en }, ja: { translation: ja } },
+  lng: initialLocale,
+  fallbackLng: "zh-CN",
+  interpolation: { escapeValue: false },
+}
+
+i18n.use(initReactI18next)
+void i18n.init(initOptions)
+
+export async function setLocale(locale: Locale) {
+  document.cookie = `monomi_locale=${locale}; path=/; max-age=31536000; samesite=lax`
+  document.documentElement.lang = locale
+  await i18n.changeLanguage(locale)
+}
+
+export default i18n

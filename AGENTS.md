@@ -2,145 +2,175 @@
 
 ## 项目边界
 
-Monomi 是一个纯前端 Uptime / 服务状态监控 DEMO。
+Monomi 是一个单用户、单实例、单容器的自托管可用性监控器。
 
-- 项目使用 Bun、React Router v7 SPA、Tailwind CSS v4、shadcn/ui 和 Framer Motion。
-- 页面只展示本地 Mock 数据。
-- 项目不连接后端，不发送业务网络请求，不使用数据库。
-- 项目不实现身份验证、权限、真实监控、证书扫描、通知、定时任务、WebSocket 或持久化。
-- 按钮、菜单和导航项可以展示交互状态，但不得伪装成已实现的业务功能。
+- Bun 是运行时和包管理器。
+- Hono 提供 API、健康检查、静态资源和 SPA 回退。
+- React Router v7 使用 SPA 模式，`ssr: false`。
+- SQLite 通过 `bun:sqlite` 使用 WAL 模式。
+- Drizzle ORM 定义结构并访问数据。
+- drizzle-kit 生成并检查迁移。
+- Zod 定义共享输入契约。
+- SWR 管理浏览器 API 状态。
+
+不要引入 PostgreSQL、Redis、队列、分布式 Worker、团队、RBAC、计费、企业 SSO 或多租户抽象。
 
 ## 必读文档
 
-修改任何页面、组件、样式、动画或 Mock 数据前，**必须先阅读 `DESIGN-SYSTEM.md`**。
+修改界面、组件、样式或动画前，必须阅读 `DESIGN-SYSTEM.md`。
 
-`DESIGN-SYSTEM.md` 定义以下内容：
+修改部署、环境变量或运维流程时，必须同步检查 `README.md`、`.env.example`、`Dockerfile` 和 `compose.yaml`。
 
-- 色板和语义 token
-- 思源黑体、思源宋体的使用规则
-- 页面布局和响应式断点
-- shadcn/ui 组件组合方式
-- Framer Motion 动画节奏
-- 可访问性和视觉验证要求
-
-如果改动与设计系统冲突，优先修改实现以符合设计系统。只有在需求明确改变视觉方向时，才修改设计系统文档。
-
-## 目录结构
+## 架构
 
 ```text
-app/
-├── app.css                         全局 token、字体和基础样式
-├── root.tsx                        HTML 壳、Meta、TooltipProvider
-├── routes.ts                       React Router 路由表
-├── routes/
-│   ├── home.tsx                    公开状态页路由 `/`
-│   └── overview.tsx                后台总览路由 `/overview`
-├── components/
-│   ├── public-status-page.tsx      公开状态页组合
-│   ├── admin-shell.tsx             后台侧栏和顶部壳
-│   ├── overview-dashboard.tsx      后台总览内容
-│   ├── monitor-card.tsx             监视器状态卡片
-│   ├── status-history.tsx           90 天状态单元和 Tooltip
-│   ├── utility-menus.tsx            语言、主题和退出入口
-│   ├── motion-primitives.tsx        Reveal 和 stagger 动画
-│   └── ui/                         shadcn/ui 源码组件
-└── data/
-    └── mock-data.ts                 所有本地展示数据和类型
+app/                         React Router SPA
+  components/                业务组件和 shadcn/ui 组件
+  hooks/                     SWR 读取模型
+  lib/                       API、认证、i18n 和工具函数
+  routes/                    公开页、认证页和 /app 管理页
+server/                      Bun + Hono 服务
+  db/                        Drizzle schema、SQLite 客户端和种子设置
+  middleware/                管理员认证
+  routes/                    Hono API
+  services/                  检测器、调度器、通知、备份和配置迁移
+shared/                      浏览器与服务端共享的 Zod 契约
+drizzle/                     drizzle-kit 生成的迁移
+tests/                       Bun 行为测试和本地测试夹具
 ```
 
-## 页面契约
+生产环境由一个 Bun 进程运行 `server/index.ts`。该进程负责 HTTP 服务、调度、检测、通知重试、保留清理和 SQLite。
 
-### 公开状态页 `/`
+## 稳定契约
 
-必须保留以下信息层级：
+监视器类型：
 
-1. 站点标识和语言、主题入口。
-2. 当前项目名称、整体状态、更新时间。
-3. 多个监视器及其 24 小时、7 天、30 天可用率。
-4. 每个监视器的连续 90 天每日记录。
-5. 每个日期的 Tooltip：日期、状态、可用率、检查次数。
-6. 最近事件列表或空状态。
-7. footer。
+- `http`
+- `tcp`
+- `heartbeat`
 
-### 后台总览 `/overview`
+监视器状态：
 
-必须保留以下信息层级：
+- `pending`
+- `operational`
+- `degraded`
+- `outage`
+- `paused`
 
-1. 后台导航：总览、监视器、事件、状态页、API 密钥、系统、安全、收起导航。
-2. 顶部语言、主题和退出入口。
-3. 全局运行状态、成功率、监视器数量、故障数量、证书数量。
-4. 核心统计。
-5. 监视器摘要。
-6. 需要关注列表或空状态。
+事件状态：
 
-其他导航项不应新增没有实现的页面。
+- `ongoing`
+- `resolved`
 
-## 数据约定
+通知事件：
 
-- 所有展示数据放在 `app/data/mock-data.ts`。
-- 使用 TypeScript 类型描述监视器、每日历史、事件、证书和待关注项。
-- 页面组件必须支持数组中的多条数据。
-- 不要把页面结构写成只支持一条监视器或一条事件。
-- 日期历史必须保持 90 条连续记录。
-- 修改 Mock 数据时，同时检查公开页和后台页是否仍能展示正常、异常、维护和空状态。
+- `outage`
+- `recovery`
+- `certificate_expiry`
+- `test`
 
-## UI 实现规则
+公开 API 不得返回目标地址、请求 Header、请求 Body、原始错误、Heartbeat 令牌、会话或 Webhook 配置。
 
-- 修改界面前阅读 `DESIGN-SYSTEM.md`。
+内部目标是受支持的产品能力。不要阻止回环、RFC1918、链路本地或内部 DNS 地址。继续执行协议、超时、响应大小、重定向和输入长度限制。
+
+## 数据库规则
+
+`server/db/schema.ts` 是结构源文件。
+
+修改数据库结构时：
+
+1. 修改 Drizzle schema。
+2. 运行 `bun run db:generate`。
+3. 检查生成迁移。
+4. 运行 `bun run db:check`。
+5. 提交 schema、迁移和元数据。
+
+不得手写迁移 SQL。不得使用 `drizzle-kit push`。不得绕过启动迁移。
+
+需要跨表保持一致性的状态变化必须使用 SQLite 事务。事件创建、事件恢复、监视器状态和通知投递必须保持原子性。
+
+## API 和认证规则
+
+- `/` 是公开状态页。
+- `/setup` 只在首次初始化前创建管理员。
+- `/login` 登录唯一管理员。
+- 所有管理页面位于 `/app/*`。
+- 所有管理 API 位于 `/api/admin/*`。
+- Heartbeat 接收路径位于 `/api/heartbeat/:token`。
+- `/health` 必须同时检查数据库和调度器状态。
+
+密码使用 `Bun.password` 的 Argon2id。会话 Cookie 必须是 HTTP-only。数据库只存储会话令牌的 SHA-256 哈希。
+
+修改写入接口时，保留同源检查、Zod 校验和统一错误结构。
+
+## 监控规则
+
+- HTTP 检测必须限制重定向、响应体大小和总超时。
+- TCP 检测必须使用 Bun TCP API，并在所有路径关闭 socket。
+- Heartbeat 必须使用高熵令牌。轮换后旧令牌立即失效。
+- 调度器不得回放停机期间错过的所有间隔。
+- 同一监视器不得并发运行两个检测。
+- 第一次失败只增加连续失败计数。达到阈值后创建故障事件。
+- 故障后的第一次成功必须恢复事件并重置状态。
+
+Generic Webhook 是唯一通知渠道。不要添加 SMTP 或特定聊天平台集成。
+
+## UI 规则
+
 - 优先复用 `app/components/ui/` 中的 shadcn/ui 组件。
-- 新增 shadcn/ui 组件前使用 shadcn CLI 安装，并检查生成文件。
-- 组件之间使用 `gap-*`，不要使用 `space-x-*` 或 `space-y-*`。
-- 使用语义 token，例如 `bg-background`、`text-foreground`、`bg-primary` 和 `text-muted-foreground`。
-- 不在页面中直接新增任意颜色值。
-- 图标使用项目已有的 `lucide-react`，不要使用 emoji 代替图标。
-- 交互控件必须有可访问名称。图标按钮必须使用 `aria-label`。
-- 90 天状态单元必须支持键盘焦点和 Tooltip。
-- 弹层组件必须保留可访问标题或可访问名称。
-- 页面必须先满足移动端布局，再增强桌面端布局。
+- 新增 shadcn/ui 组件时使用 CLI。不要使用 `--overwrite`。
+- 不要在页面中手写已有的 shadcn primitive。
+- 组件之间使用 `gap-*`。不要使用 `space-x-*` 或 `space-y-*`。
+- 使用语义颜色 token。不要在页面中新增任意颜色值。
+- 图标使用 `lucide-react`。不要用 emoji 代替图标。
+- 交互控件必须有可访问名称。
+- 大型检查、事件和通知列表必须继续使用虚拟滚动。
+- 浏览器状态使用 SWR。不要使用 `localStorage`。
+- 主题、语言和会话使用 Cookie。
 
-## 动画规则
-
-- 使用 Framer Motion，不要添加新的动画库。
-- 动画应表达内容层级和状态变化，不得遮挡信息。
-- 使用短距离位移、透明度、轻微缩放和 spring；避免夸张弹跳。
-- 滚动进入动画必须设置 `viewport={{ once: true }}`，避免重复触发造成阅读干扰。
-- 动画失败时，内容仍必须可读。不要依赖动画完成后才生成内容。
-- 不使用渐变、发光装饰、漂浮抽象形状或无意义的技术标签。
+修改共享或导出符号前，使用 LSP 查找全部引用。迁移所有调用方，并删除旧路径、别名和兼容层。
 
 ## 开发命令
-
-在仓库根目录运行：
 
 ```bash
 bun install
 bun run dev
 bun run typecheck
+bun test
 bun run build
+bun run db:check
 bun run format
 ```
 
-- `bun run typecheck` 检查 React Router 类型生成和 TypeScript。
-- `bun run build` 生成 React Router SPA 构建产物。
-- `bun run format` 使用 Prettier 和 Tailwind 插件格式化 TypeScript 文件。
-- 不要把 `build/` 产物手动复制回 `app/`。
+只使用 Bun 运行项目命令和管理依赖。不要提交 npm、pnpm 或 Yarn 锁文件。
 
 ## 验证要求
 
-完成界面改动后，必须：
+错误修复必须先复现，再确认原路径不再失败。
 
-1. 运行 `bun run typecheck`。
-2. 运行 `bun run build`。
-3. 启动开发服务器，在浏览器打开 `/` 和 `/overview`。
-4. 检查桌面端和移动端首屏。
-5. 检查路由直接访问、移动导航、侧栏收起和 Tooltip。
-6. 检查页面内容在动画未触发时仍然可读。
+后端或数据变更至少运行：
 
-除非用户明确要求，不要添加后端测试、数据库、认证或数据持久化。
+```bash
+bun run typecheck
+bun test
+bun run db:check
+```
+
+前端变更还必须运行：
+
+```bash
+bun run build
+```
+
+使用真实浏览器验证受影响页面。完整功能变更需要覆盖首次设置、登录、监视器创建、故障、恢复和公开状态页。
+
+部署变更必须运行 `docker compose build`。启动容器后检查 `/health`，并确认主机端口只绑定到 `127.0.0.1`。
 
 ## 部署和 Git
 
-- Vercel 配置位于 `vercel.json`。
-- 这是 SPA。路由直接访问必须回退到 `index.html`。
-- 提交前检查 `git diff`，确认没有凭据、临时截图、构建产物或本地状态文件。
-- 不要覆盖用户未创建的改动。
-- 不要在没有明确授权时执行 `git push`、删除远程分支或修改生产部署。
+- `Dockerfile` 的构建和运行阶段都使用 Bun。
+- `compose.yaml` 只将端口发布到主机回环地址。
+- `/data` 是唯一持久化目录。
+- 不要提交 `.env`、`monomi-data/`、SQLite 文件、WAL 文件、备份、构建产物或临时截图。
+- 保留用户未提交的无关改动。
+- 只有用户明确授权时才能提交、推送或修改生产部署。

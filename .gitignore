@@ -1,5 +1,6 @@
 .DS_Store
 .env*
+!.env.example
 node_modules
 
 # React Router
@@ -9,3 +10,13 @@ build
 # typescript
 *.tsbuildinfo
 .vercel
+
+# Monomi runtime data
+data/
+monomi-data/
+coverage/
+*.sqlite-wal
+*.sqlite-shm
+*.db-wal
+*.db-shm
+backups/
