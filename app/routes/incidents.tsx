@@ -32,7 +32,7 @@ export default function IncidentsRoute() {
     filter === "all" ? undefined : filter
   )
   return (
-    <main className="mx-auto flex max-w-7xl flex-col gap-5 px-3 py-6 md:gap-6 md:px-8 md:py-8">
+    <main className="flex w-full flex-col gap-5 px-3 py-6 md:gap-6 md:px-8 md:py-8">
       <div className="flex flex-col gap-2">
         <p className="text-sm font-medium text-primary">事件</p>
         <h1 className="font-serif text-4xl font-semibold">故障记录</h1>

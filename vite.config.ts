@@ -4,16 +4,31 @@ import { defineConfig } from "vite"
 
 export default defineConfig({
   resolve: {
-    alias: [
-      { find: /^react-dom\/server$/, replacement: "react-dom/server.node" },
-    ],
     tsconfigPaths: true,
   },
   server: {
     proxy: {
-      "/api": "http://127.0.0.1:3001",
-      "/health": "http://127.0.0.1:3001",
-      "/uploads": "http://127.0.0.1:3001",
+      "/api": {
+        target: "http://127.0.0.1:3001",
+        headers: {
+          "X-Forwarded-Host": "localhost:5173",
+          "X-Forwarded-Proto": "http",
+        },
+      },
+      "/health": {
+        target: "http://127.0.0.1:3001",
+        headers: {
+          "X-Forwarded-Host": "localhost:5173",
+          "X-Forwarded-Proto": "http",
+        },
+      },
+      "/uploads": {
+        target: "http://127.0.0.1:3001",
+        headers: {
+          "X-Forwarded-Host": "localhost:5173",
+          "X-Forwarded-Proto": "http",
+        },
+      },
     },
   },
   plugins: [tailwindcss(), reactRouter()],

@@ -59,13 +59,13 @@ export default function MonitorDetailRoute() {
   const [pending, setPending] = useState(false)
   if (!monitorQuery.data && !monitorQuery.error)
     return (
-      <main className="mx-auto max-w-7xl px-3 py-6 md:px-8">
+      <main className="w-full px-3 py-6 md:px-8">
         <Skeleton className="h-96 w-full" />
       </main>
     )
   if (monitorQuery.error || !monitorQuery.data || !monitorId)
     return (
-      <main className="mx-auto max-w-7xl px-3 py-6 md:px-8">
+      <main className="w-full px-3 py-6 md:px-8">
         <Alert variant="destructive">
           <AlertTitle>无法加载监视器</AlertTitle>
           <AlertDescription>
@@ -143,7 +143,7 @@ export default function MonitorDetailRoute() {
   const buckets = activityQuery.data?.metrics.buckets ?? []
   const history = activityQuery.data?.history.history ?? []
   return (
-    <main className="mx-auto flex max-w-7xl flex-col gap-6 px-3 py-6 md:gap-7 md:px-8 md:py-8">
+    <main className="flex w-full flex-col gap-6 px-3 py-6 md:gap-7 md:px-8 md:py-8">
       <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
         <div className="flex flex-col gap-2">
           <p className="text-sm font-medium text-primary">

@@ -40,13 +40,13 @@ export default function SettingsRoute() {
   const backups = useBackups()
   if (settings.isLoading)
     return (
-      <main className="mx-auto max-w-7xl px-3 py-6 md:px-8">
+      <main className="w-full px-3 py-6 md:px-8">
         <Skeleton className="h-96 w-full" />
       </main>
     )
   if (settings.error || !settings.data)
     return (
-      <main className="mx-auto max-w-7xl px-3 py-6 md:px-8">
+      <main className="w-full px-3 py-6 md:px-8">
         <Alert variant="destructive">
           <AlertTitle>无法加载设置</AlertTitle>
           <AlertDescription>
@@ -175,7 +175,7 @@ function SettingsContent({
     ])
   }
   return (
-    <main className="mx-auto flex max-w-7xl flex-col gap-6 px-3 py-6 md:gap-7 md:px-8 md:py-8">
+    <main className="flex w-full flex-col gap-6 px-3 py-6 md:gap-7 md:px-8 md:py-8">
       <div className="flex flex-col gap-2">
         <p className="text-sm font-medium text-primary">Monomi</p>
         <h1 className="font-serif text-4xl font-semibold">{t("settings")}</h1>

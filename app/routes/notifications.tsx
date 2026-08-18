@@ -63,13 +63,13 @@ export default function NotificationsRoute() {
   const [saving, setSaving] = useState(false)
   if (isLoading)
     return (
-      <main className="mx-auto max-w-7xl px-3 py-6 md:px-8">
+      <main className="w-full px-3 py-6 md:px-8">
         <Skeleton className="h-96 w-full" />
       </main>
     )
   if (error || !data)
     return (
-      <main className="mx-auto max-w-7xl px-3 py-6 md:px-8">
+      <main className="w-full px-3 py-6 md:px-8">
         <Alert variant="destructive">
           <AlertTitle>无法加载通知</AlertTitle>
           <AlertDescription>
@@ -122,7 +122,7 @@ export default function NotificationsRoute() {
     await mutate("notifications")
   }
   return (
-    <main className="mx-auto flex max-w-7xl flex-col gap-5 px-3 py-6 md:gap-6 md:px-8 md:py-8">
+    <main className="flex w-full flex-col gap-5 px-3 py-6 md:gap-6 md:px-8 md:py-8">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div className="flex flex-col gap-2">
           <p className="text-sm font-medium text-primary">运行中心</p>

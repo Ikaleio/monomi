@@ -197,6 +197,50 @@ describe("scheduler and state machine", () => {
     expect(client.db.select().from(checks).all()).toHaveLength(1)
   })
 
+  test("records unexpected checker errors as failed outcomes", async () => {
+    const client = await database()
+    const now = new Date("2026-08-18T12:00:00Z")
+    const monitorId = crypto.randomUUID()
+    insertMonitor(client, monitorId, now)
+    client.db
+      .update(monitors)
+      .set({ failureThreshold: 1 })
+      .where(eq(monitors.id, monitorId))
+      .run()
+    const scheduler = new MonitorScheduler(
+      client.db,
+      1,
+      async () => {
+        throw new Error("checker crashed")
+      },
+      () => now
+    )
+
+    const outcome = await scheduler.runNow(monitorId)
+    const row = client.db
+      .select()
+      .from(monitors)
+      .where(eq(monitors.id, monitorId))
+      .get()
+    const recorded = client.db
+      .select()
+      .from(checks)
+      .where(eq(checks.monitorId, monitorId))
+      .get()
+
+    expect(outcome).toMatchObject({
+      success: false,
+      errorCode: "UNKNOWN_ERROR",
+      errorMessage: "checker crashed",
+    })
+    expect(row?.status).toBe("outage")
+    expect(recorded).toMatchObject({
+      success: false,
+      errorCode: "UNKNOWN_ERROR",
+      errorMessage: "checker crashed",
+    })
+  })
+
   test("detects stale heartbeats at interval plus grace", async () => {
     const client = await database()
     const createdAt = new Date("2026-08-18T12:00:00Z")
