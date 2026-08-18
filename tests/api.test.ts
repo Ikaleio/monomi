@@ -38,6 +38,33 @@ async function setup(app: ReturnType<typeof createApp>) {
 }
 
 describe("API behavior", () => {
+  test("accepts matching reverse proxy origins and rejects mismatches", async () => {
+    const service = await harness()
+    const body = JSON.stringify({
+      username: "admin",
+      password: "correct-horse-battery",
+    })
+    const proxyHeaders = {
+      "Content-Type": "application/json",
+      "X-Forwarded-Host": "up.example.com",
+      "X-Forwarded-Proto": "https",
+    }
+
+    const rejected = await service.app.request("http://127.0.0.1/api/setup", {
+      method: "POST",
+      headers: { ...proxyHeaders, Origin: "https://other.example.com" },
+      body,
+    })
+    expect(rejected.status).toBe(403)
+
+    const accepted = await service.app.request("http://127.0.0.1/api/setup", {
+      method: "POST",
+      headers: { ...proxyHeaders, Origin: "https://up.example.com" },
+      body,
+    })
+    expect(accepted.status).toBe(201)
+  })
+
   test("enforces one-time setup, logout, and session expiry", async () => {
     const service = await harness()
     const cookie = await setup(service.app)

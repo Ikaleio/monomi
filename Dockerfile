@@ -25,8 +25,7 @@ COPY --from=build /app/shared ./shared
 COPY --from=build /app/drizzle ./drizzle
 COPY --from=build /app/package.json ./package.json
 RUN mkdir -p /data && chown -R bun:bun /app /data
-USER bun
 EXPOSE 3000
 VOLUME ["/data"]
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 CMD ["bun", "-e", "const r=await fetch('http://127.0.0.1:3000/health');process.exit(r.ok?0:1)"]
-CMD ["bun", "server/index.ts"]
+CMD ["bun", "server/entrypoint.ts"]

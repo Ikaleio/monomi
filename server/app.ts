@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm"
-import { Hono } from "hono"
+import { Hono, type Context } from "hono"
 import { serveStatic } from "hono/bun"
 import { secureHeaders } from "hono/secure-headers"
 
@@ -42,6 +42,25 @@ export function createApiRoutes(deps: AppDeps) {
     .route("/admin/config", createConfigTransferRoutes(deps))
 }
 
+function firstForwardedValue(value: string | undefined) {
+  return value?.split(",", 1)[0]?.trim()
+}
+
+function requestOrigin(c: Context<AppEnv>) {
+  const internal = new URL(c.req.url)
+  const protocol = firstForwardedValue(c.req.header("X-Forwarded-Proto"))
+  const host =
+    firstForwardedValue(c.req.header("X-Forwarded-Host")) ??
+    c.req.header("Host")
+  if (!protocol || !host) return internal.origin
+
+  try {
+    return new URL(`${protocol}://${host}`).origin
+  } catch {
+    return internal.origin
+  }
+}
+
 export function createApp(deps: AppDeps) {
   const app = new Hono<AppEnv>()
   app.use("*", secureHeaders())
@@ -56,7 +75,7 @@ export function createApp(deps: AppDeps) {
   app.use("*", async (c, next) => {
     if (["POST", "PATCH", "PUT", "DELETE"].includes(c.req.method)) {
       const origin = c.req.header("Origin")
-      if (origin && origin !== new URL(c.req.url).origin) {
+      if (origin && origin !== requestOrigin(c)) {
         return jsonError(c, 403, "INVALID_ORIGIN", "请求来源无效")
       }
     }
