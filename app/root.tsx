@@ -8,19 +8,21 @@ import {
 } from "react-router"
 
 import type { Route } from "./+types/root"
+import { TooltipProvider } from "~/components/ui/tooltip"
 import "./app.css"
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="zh-CN" className="bg-background">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#f7f8f6" />
         <Meta />
         <Links />
       </head>
-      <body>
-        {children}
+      <body className="min-h-svh bg-background font-sans antialiased">
+        <TooltipProvider>{children}</TooltipProvider>
         <ScrollRestoration />
         <Scripts />
       </body>
