@@ -1,15 +1,9 @@
 import { and, asc, eq, lte } from "drizzle-orm"
 
 import { headersSchema } from "../../shared/contracts"
-import {
-  notificationChannels,
-  notificationDeliveries,
-} from "../db/schema"
+import { notificationChannels, notificationDeliveries } from "../db/schema"
 import type { AppDatabase } from "../http/types"
-import {
-  renderWebhookTemplate,
-  type WebhookPayload,
-} from "./template"
+import { renderWebhookTemplate, type WebhookPayload } from "./template"
 
 export type NotificationSendResult = {
   ok: boolean
@@ -19,7 +13,7 @@ export type NotificationSendResult = {
 export type NotificationSender = (
   url: string,
   headers: Record<string, string>,
-  body: Record<string, unknown>,
+  body: Record<string, unknown>
 ) => Promise<NotificationSendResult>
 
 export const sendWebhook: NotificationSender = async (url, headers, body) => {
@@ -37,7 +31,10 @@ export const sendWebhook: NotificationSender = async (url, headers, body) => {
   } catch (error) {
     return {
       ok: false,
-      error: error instanceof Error ? error.message.slice(0, 500) : "Webhook 发送失败",
+      error:
+        error instanceof Error
+          ? error.message.slice(0, 500)
+          : "Webhook 发送失败",
     }
   }
 }
@@ -49,7 +46,7 @@ export class NotificationDispatcher {
   constructor(
     private readonly db: AppDatabase,
     private readonly sender: NotificationSender = sendWebhook,
-    private readonly now: () => Date = () => new Date(),
+    private readonly now: () => Date = () => new Date()
   ) {}
 
   start() {
@@ -79,8 +76,8 @@ export class NotificationDispatcher {
       .where(
         and(
           eq(notificationDeliveries.status, "pending"),
-          lte(notificationDeliveries.nextAttemptAt, now),
-        ),
+          lte(notificationDeliveries.nextAttemptAt, now)
+        )
       )
       .orderBy(asc(notificationDeliveries.id))
       .limit(25)
@@ -114,7 +111,10 @@ export class NotificationDispatcher {
       } catch (error) {
         result = {
           ok: false,
-          error: error instanceof Error ? error.message.slice(0, 500) : "模板渲染失败",
+          error:
+            error instanceof Error
+              ? error.message.slice(0, 500)
+              : "模板渲染失败",
         }
       }
       const attempts = delivery.attempts + 1

@@ -12,7 +12,7 @@ import { recordCertificate, recordOutcome } from "./state"
 export type MonitorChecker = (
   monitor: MonitorRow,
   signal?: AbortSignal,
-  now?: Date,
+  now?: Date
 ) => Promise<CheckOutcome>
 
 export class MonitorScheduler implements SchedulerLike {
@@ -26,7 +26,7 @@ export class MonitorScheduler implements SchedulerLike {
     private readonly db: AppDatabase,
     private readonly concurrency = 10,
     private readonly checker: MonitorChecker = runMonitorCheck,
-    private readonly now: () => Date = () => new Date(),
+    private readonly now: () => Date = () => new Date()
   ) {}
 
   isRunning() {
@@ -62,19 +62,16 @@ export class MonitorScheduler implements SchedulerLike {
       const due = tx
         .select()
         .from(monitors)
-        .where(
-          and(
-            eq(monitors.enabled, true),
-            lte(monitors.nextCheckAt, now),
-          ),
-        )
+        .where(and(eq(monitors.enabled, true), lte(monitors.nextCheckAt, now)))
         .all()
         .filter((monitor) => !this.running.has(monitor.id))
         .slice(0, available)
       for (const monitor of due) {
         tx.update(monitors)
           .set({
-            nextCheckAt: new Date(now.getTime() + monitor.intervalSeconds * 1000),
+            nextCheckAt: new Date(
+              now.getTime() + monitor.intervalSeconds * 1000
+            ),
             updatedAt: now,
           })
           .where(eq(monitors.id, monitor.id))
@@ -86,9 +83,14 @@ export class MonitorScheduler implements SchedulerLike {
   }
 
   async runNow(monitorId: string): Promise<CheckOutcome> {
-    const monitor = this.db.select().from(monitors).where(eq(monitors.id, monitorId)).get()
+    const monitor = this.db
+      .select()
+      .from(monitors)
+      .where(eq(monitors.id, monitorId))
+      .get()
     if (!monitor) throw new ApiError(404, "MONITOR_NOT_FOUND", "监视器不存在")
-    if (!monitor.enabled) throw new ApiError(409, "MONITOR_PAUSED", "监视器已暂停")
+    if (!monitor.enabled)
+      throw new ApiError(409, "MONITOR_PAUSED", "监视器已暂停")
     if (this.running.has(monitorId)) {
       throw new ApiError(409, "CHECK_IN_PROGRESS", "该监视器正在检测")
     }
@@ -97,7 +99,11 @@ export class MonitorScheduler implements SchedulerLike {
 
   async recordHeartbeat(monitorId: string): Promise<CheckOutcome> {
     const now = this.now()
-    const monitor = this.db.select().from(monitors).where(eq(monitors.id, monitorId)).get()
+    const monitor = this.db
+      .select()
+      .from(monitors)
+      .where(eq(monitors.id, monitorId))
+      .get()
     if (!monitor || monitor.type !== "heartbeat") {
       throw new ApiError(404, "MONITOR_NOT_FOUND", "Heartbeat 监视器不存在")
     }
@@ -111,7 +117,7 @@ export class MonitorScheduler implements SchedulerLike {
       .update(monitors)
       .set({
         nextCheckAt: new Date(
-          now.getTime() + (input.intervalSeconds + input.graceSeconds) * 1000,
+          now.getTime() + (input.intervalSeconds + input.graceSeconds) * 1000
         ),
         updatedAt: now,
       })
@@ -148,7 +154,7 @@ export class MonitorScheduler implements SchedulerLike {
           this.db,
           monitor.id,
           certificate.success ? certificate.expiresAt : null,
-          now,
+          now
         )
       }
     }

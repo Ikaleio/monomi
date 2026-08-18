@@ -37,14 +37,18 @@ function settingsView(row: typeof settings.$inferSelect) {
 }
 
 async function getSettings(deps: AppDeps) {
-  const row = await deps.db.query.settings.findFirst({ where: eq(settings.id, 1) })
+  const row = await deps.db.query.settings.findFirst({
+    where: eq(settings.id, 1),
+  })
   if (!row) throw new ApiError(500, "SETTINGS_MISSING", "系统设置尚未初始化")
   return row
 }
 
 export function createSettingsRoutes(deps: AppDeps) {
   return new Hono<AppEnv>()
-    .get("/", async (c) => c.json({ settings: settingsView(await getSettings(deps)) }))
+    .get("/", async (c) =>
+      c.json({ settings: settingsView(await getSettings(deps)) })
+    )
     .patch("/", async (c) => {
       const input = settingsInputSchema.parse(await parseJson(c))
       await deps.db
@@ -62,8 +66,13 @@ export function createAccountRoutes(deps: AppDeps) {
     }
     const input = passwordChangeSchema.parse(await parseJson(c))
     const adminId = c.get("adminId")
-    const admin = await deps.db.query.admins.findFirst({ where: eq(admins.id, adminId) })
-    if (!admin || !(await Bun.password.verify(input.currentPassword, admin.passwordHash))) {
+    const admin = await deps.db.query.admins.findFirst({
+      where: eq(admins.id, adminId),
+    })
+    if (
+      !admin ||
+      !(await Bun.password.verify(input.currentPassword, admin.passwordHash))
+    ) {
       throw new ApiError(401, "INVALID_CREDENTIALS", "当前密码错误")
     }
     const passwordHash = await Bun.password.hash(input.newPassword, {

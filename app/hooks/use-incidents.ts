@@ -3,7 +3,10 @@ import useSWR from "swr"
 
 import { api, swrConfig, unwrap } from "~/lib/api-client"
 
-export type IncidentsData = InferResponseType<typeof api.admin.incidents.$get, 200>
+export type IncidentsData = InferResponseType<
+  typeof api.admin.incidents.$get,
+  200
+>
 
 export function useIncidents(status?: "ongoing" | "resolved") {
   return useSWR<IncidentsData>(
@@ -12,8 +15,8 @@ export function useIncidents(status?: "ongoing" | "resolved") {
       unwrap(
         await api.admin.incidents.$get({
           query: { limit: "100", ...(status ? { status } : {}) },
-        }),
+        })
       ),
-    { ...swrConfig, refreshInterval: 10000 },
+    { ...swrConfig, refreshInterval: 10000 }
   )
 }

@@ -21,10 +21,14 @@ export function recordOutcome(
   monitorId: string,
   outcome: CheckOutcome,
   now = new Date(),
-  options: RecordOptions = {},
+  options: RecordOptions = {}
 ) {
   return db.transaction((tx) => {
-    const monitor = tx.select().from(monitors).where(eq(monitors.id, monitorId)).get()
+    const monitor = tx
+      .select()
+      .from(monitors)
+      .where(eq(monitors.id, monitorId))
+      .get()
     if (!monitor) throw new ApiError(404, "MONITOR_NOT_FOUND", "监视器不存在")
 
     tx.insert(checks)
@@ -89,7 +93,12 @@ export function recordOutcome(
     if (status === "outage" && previousStatus !== "outage") {
       incidentId = tx
         .insert(incidents)
-        .values({ monitorId, status: "ongoing", startedAt: now, createdAt: now })
+        .values({
+          monitorId,
+          status: "ongoing",
+          startedAt: now,
+          createdAt: now,
+        })
         .returning({ id: incidents.id })
         .get().id
       event = "outage"
@@ -97,12 +106,21 @@ export function recordOutcome(
       const active = tx
         .select()
         .from(incidents)
-        .where(and(eq(incidents.monitorId, monitorId), eq(incidents.status, "ongoing")))
+        .where(
+          and(
+            eq(incidents.monitorId, monitorId),
+            eq(incidents.status, "ongoing")
+          )
+        )
         .get()
       if (active) {
         incidentId = active.id
         tx.update(incidents)
-          .set({ status: "resolved", resolvedAt: now, resolution: "服务检测恢复" })
+          .set({
+            status: "resolved",
+            resolvedAt: now,
+            resolution: "服务检测恢复",
+          })
           .where(eq(incidents.id, active.id))
           .run()
         event = "recovery"
@@ -129,17 +147,17 @@ export function recordOutcome(
           monitorNotificationChannels,
           and(
             eq(monitorNotificationChannels.channelId, notificationChannels.id),
-            eq(monitorNotificationChannels.monitorId, monitorId),
-          ),
+            eq(monitorNotificationChannels.monitorId, monitorId)
+          )
         )
         .where(
           and(
             eq(notificationChannels.enabled, true),
             or(
               eq(notificationChannels.allMonitors, true),
-              eq(monitorNotificationChannels.monitorId, monitorId),
-            ),
-          ),
+              eq(monitorNotificationChannels.monitorId, monitorId)
+            )
+          )
         )
         .all()
       const startedAt = tx
@@ -156,7 +174,10 @@ export function recordOutcome(
             resolvedAt: event === "recovery" ? now : null,
             durationSeconds:
               event === "recovery" && startedAt
-                ? Math.max(0, Math.round((now.getTime() - startedAt.getTime()) / 1000))
+                ? Math.max(
+                    0,
+                    Math.round((now.getTime() - startedAt.getTime()) / 1000)
+                  )
                 : null,
           },
           check: {
@@ -190,10 +211,14 @@ export function recordCertificate(
   db: AppDatabase,
   monitorId: string,
   expiresAt: Date | null,
-  now = new Date(),
+  now = new Date()
 ) {
   return db.transaction((tx) => {
-    const monitor = tx.select().from(monitors).where(eq(monitors.id, monitorId)).get()
+    const monitor = tx
+      .select()
+      .from(monitors)
+      .where(eq(monitors.id, monitorId))
+      .get()
     if (!monitor) throw new ApiError(404, "MONITOR_NOT_FOUND", "监视器不存在")
     if (!expiresAt) {
       tx.update(monitors)
@@ -204,11 +229,16 @@ export function recordCertificate(
     }
     const expiryChanged =
       monitor.certificateExpiresAt?.getTime() !== expiresAt.getTime()
-    const appSettings = tx.select().from(settings).where(eq(settings.id, 1)).get()
+    const appSettings = tx
+      .select()
+      .from(settings)
+      .where(eq(settings.id, 1))
+      .get()
     const shouldNotify =
       Boolean(appSettings) &&
       expiresAt.getTime() <=
-        now.getTime() + (appSettings?.certificateWarningDays ?? 30) * 86400000 &&
+        now.getTime() +
+          (appSettings?.certificateWarningDays ?? 30) * 86400000 &&
       monitor.certificateNotifiedForExpiry?.getTime() !== expiresAt.getTime()
 
     tx.update(monitors)
@@ -233,17 +263,17 @@ export function recordCertificate(
         monitorNotificationChannels,
         and(
           eq(monitorNotificationChannels.channelId, notificationChannels.id),
-          eq(monitorNotificationChannels.monitorId, monitorId),
-        ),
+          eq(monitorNotificationChannels.monitorId, monitorId)
+        )
       )
       .where(
         and(
           eq(notificationChannels.enabled, true),
           or(
             eq(notificationChannels.allMonitors, true),
-            eq(monitorNotificationChannels.monitorId, monitorId),
-          ),
-        ),
+            eq(monitorNotificationChannels.monitorId, monitorId)
+          )
+        )
       )
       .all()
     for (const channel of channels) {
@@ -257,8 +287,16 @@ export function recordCertificate(
           nextAttemptAt: now,
           payloadJson: JSON.stringify({
             event: "certificate_expiry",
-            monitor: { id: monitor.id, name: monitor.name, status: monitor.status },
-            incident: { startedAt: null, resolvedAt: null, durationSeconds: null },
+            monitor: {
+              id: monitor.id,
+              name: monitor.name,
+              status: monitor.status,
+            },
+            incident: {
+              startedAt: null,
+              resolvedAt: null,
+              durationSeconds: null,
+            },
             check: { error: null, latencyMs: null },
             certificate: { expiresAt },
           }),

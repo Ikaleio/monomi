@@ -7,7 +7,7 @@ import type { CheckOutcome } from "./types"
 export async function runMonitorCheck(
   row: MonitorRow,
   signal?: AbortSignal,
-  now = new Date(),
+  now = new Date()
 ): Promise<CheckOutcome> {
   const monitor = monitorInputFromRow(row)
   switch (monitor.type) {

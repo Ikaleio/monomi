@@ -12,6 +12,6 @@ export function useNotifications() {
   return useSWR<NotificationsData>(
     "notifications",
     async () => unwrap(await api.admin.notifications.$get()),
-    { ...swrConfig, refreshInterval: 10000 },
+    { ...swrConfig, refreshInterval: 10000 }
   )
 }

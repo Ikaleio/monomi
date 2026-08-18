@@ -11,9 +11,9 @@ export function usePublicStatus() {
     async () => {
       const response = await api.public.status.$get()
       return unwrap<PublicStatusData>(
-        response as Response & { json(): Promise<PublicStatusData> },
+        response as Response & { json(): Promise<PublicStatusData> }
       )
     },
-    { ...swrConfig, refreshInterval: 30000 },
+    { ...swrConfig, refreshInterval: 30000 }
   )
 }

@@ -14,6 +14,7 @@ export function VirtualList<T>({
   getKey(item: T, index: number): string | number
   renderItem(item: T, index: number): React.ReactNode
 }) {
+  const viewportHeight = Math.min(height, items.length * estimateSize)
   const scrollRef = useRef<HTMLDivElement>(null)
   const virtualizer = useVirtualizer({
     count: items.length,
@@ -25,14 +26,24 @@ export function VirtualList<T>({
     <div
       ref={scrollRef}
       className="overflow-auto"
-      style={{ height, contain: "strict", overflowAnchor: "none" }}
+      style={{
+        height: viewportHeight,
+        contain: "strict",
+        overflowAnchor: "none",
+      }}
     >
-      <div className="relative w-full" style={{ height: virtualizer.getTotalSize() }}>
+      <div
+        className="relative w-full"
+        style={{ height: virtualizer.getTotalSize() }}
+      >
         {virtualizer.getVirtualItems().map((virtualItem) => (
           <div
             key={getKey(items[virtualItem.index], virtualItem.index)}
             className="absolute top-0 left-0 w-full"
-            style={{ height: virtualItem.size, transform: `translateY(${virtualItem.start}px)` }}
+            style={{
+              height: virtualItem.size,
+              transform: `translateY(${virtualItem.start}px)`,
+            }}
           >
             {renderItem(items[virtualItem.index], virtualItem.index)}
           </div>

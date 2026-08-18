@@ -46,7 +46,9 @@ async function channelView(deps: AppDeps, id: string) {
     enabled: channel.enabled,
     headers: JSON.parse(channel.headersJson) as Record<string, string>,
     bodyTemplate: channel.bodyTemplate,
-    monitorIds: channel.allMonitors ? null : await monitorIdsForChannel(deps, id),
+    monitorIds: channel.allMonitors
+      ? null
+      : await monitorIdsForChannel(deps, id),
     createdAt: channel.createdAt,
     updatedAt: channel.updatedAt,
   }
@@ -75,7 +77,9 @@ export function createNotificationRoutes(deps: AppDeps) {
         .orderBy(desc(notificationDeliveries.id))
         .limit(50)
       return c.json({
-        channels: await Promise.all(channels.map((channel) => channelView(deps, channel.id))),
+        channels: await Promise.all(
+          channels.map((channel) => channelView(deps, channel.id))
+        ),
         deliveries,
       })
     })
@@ -100,7 +104,9 @@ export function createNotificationRoutes(deps: AppDeps) {
           })
           .run()
         for (const monitorId of input.monitorIds ?? []) {
-          tx.insert(monitorNotificationChannels).values({ monitorId, channelId: id }).run()
+          tx.insert(monitorNotificationChannels)
+            .values({ monitorId, channelId: id })
+            .run()
         }
       })
       return c.json({ channel: await channelView(deps, id) }, 201)
@@ -137,7 +143,9 @@ export function createNotificationRoutes(deps: AppDeps) {
     })
     .delete("/:id", async (c) => {
       const channel = await getChannel(deps, c.req.param("id"))
-      await deps.db.delete(notificationChannels).where(eq(notificationChannels.id, channel.id))
+      await deps.db
+        .delete(notificationChannels)
+        .where(eq(notificationChannels.id, channel.id))
       return c.body(null, 204)
     })
     .post("/:id/test", async (c) => {
@@ -155,7 +163,11 @@ export function createNotificationRoutes(deps: AppDeps) {
           payloadJson: JSON.stringify({
             event: "test",
             monitor: { name: "Monomi 测试通知", status: "operational" },
-            incident: { startedAt: null, resolvedAt: null, durationSeconds: null },
+            incident: {
+              startedAt: null,
+              resolvedAt: null,
+              durationSeconds: null,
+            },
             check: { error: null, latencyMs: 0 },
           }),
           dedupeKey: `test:${crypto.randomUUID()}`,

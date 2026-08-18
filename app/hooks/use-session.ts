@@ -9,6 +9,6 @@ export function useSession(fallbackData?: SessionData) {
   return useSWR<SessionData>(
     "session",
     async () => unwrap(await api.auth.session.$get()),
-    { ...swrConfig, fallbackData },
+    { ...swrConfig, fallbackData }
   )
 }

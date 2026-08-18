@@ -12,14 +12,14 @@ export class ApiClientError extends Error {
     public readonly status: number,
     public readonly code: string,
     message: string,
-    public readonly fields?: Record<string, string[]>,
+    public readonly fields?: Record<string, string[]>
   ) {
     super(message)
   }
 }
 
 export async function unwrap<T>(
-  response: Response & { json(): Promise<T> },
+  response: Response & { json(): Promise<T> }
 ): Promise<T> {
   if (response.status === 204) return undefined as T
   const payload = await response.json()
@@ -35,7 +35,7 @@ export async function unwrap<T>(
       response.status,
       error.error?.code ?? "REQUEST_FAILED",
       error.error?.message ?? "请求失败",
-      error.error?.fields,
+      error.error?.fields
     )
   }
   return payload

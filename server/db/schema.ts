@@ -16,9 +16,14 @@ import type {
 } from "../../shared/contracts"
 
 const createdAt = () =>
-  integer("created_at", { mode: "timestamp_ms" }).notNull().$defaultFn(() => new Date())
+  integer("created_at", { mode: "timestamp_ms" })
+    .notNull()
+    .$defaultFn(() => new Date())
 const updatedAt = () =>
-  integer("updated_at", { mode: "timestamp_ms" }).notNull().$defaultFn(() => new Date()).$onUpdate(() => new Date())
+  integer("updated_at", { mode: "timestamp_ms" })
+    .notNull()
+    .$defaultFn(() => new Date())
+    .$onUpdate(() => new Date())
 
 export const admins = sqliteTable("admins", {
   id: text("id").primaryKey(),
@@ -38,7 +43,7 @@ export const sessions = sqliteTable(
     expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
     createdAt: createdAt(),
   },
-  (table) => [index("sessions_expires_idx").on(table.expiresAt)],
+  (table) => [index("sessions_expires_idx").on(table.expiresAt)]
 )
 
 export const settings = sqliteTable("settings", {
@@ -54,7 +59,9 @@ export const settings = sqliteTable("settings", {
   defaultFailureThreshold: integer("default_failure_threshold").notNull(),
   certificateWarningDays: integer("certificate_warning_days").notNull(),
   publicEnabled: integer("public_enabled", { mode: "boolean" }).notNull(),
-  publicShowResponseTime: integer("public_show_response_time", { mode: "boolean" }).notNull(),
+  publicShowResponseTime: integer("public_show_response_time", {
+    mode: "boolean",
+  }).notNull(),
   logoPath: text("logo_path"),
   updatedAt: updatedAt(),
 })
@@ -79,8 +86,12 @@ export const monitors = sqliteTable(
     lastCheckAt: integer("last_check_at", { mode: "timestamp_ms" }),
     lastSuccessAt: integer("last_success_at", { mode: "timestamp_ms" }),
     lastHeartbeatAt: integer("last_heartbeat_at", { mode: "timestamp_ms" }),
-    certificateExpiresAt: integer("certificate_expires_at", { mode: "timestamp_ms" }),
-    certificateCheckedAt: integer("certificate_checked_at", { mode: "timestamp_ms" }),
+    certificateExpiresAt: integer("certificate_expires_at", {
+      mode: "timestamp_ms",
+    }),
+    certificateCheckedAt: integer("certificate_checked_at", {
+      mode: "timestamp_ms",
+    }),
     certificateNotifiedForExpiry: integer("certificate_notified_for_expiry", {
       mode: "timestamp_ms",
     }),
@@ -90,7 +101,7 @@ export const monitors = sqliteTable(
   (table) => [
     index("monitors_due_idx").on(table.enabled, table.nextCheckAt),
     index("monitors_certificate_idx").on(table.certificateExpiresAt),
-  ],
+  ]
 )
 
 export const checks = sqliteTable(
@@ -107,7 +118,9 @@ export const checks = sqliteTable(
     errorMessage: text("error_message"),
     checkedAt: integer("checked_at", { mode: "timestamp_ms" }).notNull(),
   },
-  (table) => [index("checks_monitor_time_idx").on(table.monitorId, table.checkedAt)],
+  (table) => [
+    index("checks_monitor_time_idx").on(table.monitorId, table.checkedAt),
+  ]
 )
 
 export const dailyStats = sqliteTable(
@@ -124,7 +137,7 @@ export const dailyStats = sqliteTable(
     latencyMaxMs: integer("latency_max_ms"),
     worstStatus: text("worst_status").notNull().$type<MonitorStatus>(),
   },
-  (table) => [primaryKey({ columns: [table.monitorId, table.date] })],
+  (table) => [primaryKey({ columns: [table.monitorId, table.date] })]
 )
 
 export const incidents = sqliteTable(
@@ -146,7 +159,7 @@ export const incidents = sqliteTable(
       .where(sql`${table.status} = 'ongoing'`),
     index("incidents_status_id_idx").on(table.status, table.id),
     index("incidents_monitor_time_idx").on(table.monitorId, table.startedAt),
-  ],
+  ]
 )
 
 export const notificationChannels = sqliteTable("notification_channels", {
@@ -171,7 +184,7 @@ export const monitorNotificationChannels = sqliteTable(
       .notNull()
       .references(() => notificationChannels.id, { onDelete: "cascade" }),
   },
-  (table) => [primaryKey({ columns: [table.monitorId, table.channelId] })],
+  (table) => [primaryKey({ columns: [table.monitorId, table.channelId] })]
 )
 
 export const notificationDeliveries = sqliteTable(
@@ -181,15 +194,18 @@ export const notificationDeliveries = sqliteTable(
     channelId: text("channel_id")
       .notNull()
       .references(() => notificationChannels.id, { onDelete: "cascade" }),
-    monitorId: text("monitor_id")
-      .references(() => monitors.id, { onDelete: "cascade" }),
+    monitorId: text("monitor_id").references(() => monitors.id, {
+      onDelete: "cascade",
+    }),
     incidentId: integer("incident_id").references(() => incidents.id, {
       onDelete: "cascade",
     }),
     eventType: text("event_type").notNull().$type<NotificationEvent>(),
     status: text("status").notNull().$type<"pending" | "sent" | "failed">(),
     attempts: integer("attempts").notNull().default(0),
-    nextAttemptAt: integer("next_attempt_at", { mode: "timestamp_ms" }).notNull(),
+    nextAttemptAt: integer("next_attempt_at", {
+      mode: "timestamp_ms",
+    }).notNull(),
     lastError: text("last_error"),
     responseStatus: integer("response_status"),
     payloadJson: text("payload_json").notNull(),
@@ -199,9 +215,12 @@ export const notificationDeliveries = sqliteTable(
   },
   (table) => [
     uniqueIndex("notification_deliveries_dedupe_idx").on(table.dedupeKey),
-    index("notification_deliveries_due_idx").on(table.status, table.nextAttemptAt),
+    index("notification_deliveries_due_idx").on(
+      table.status,
+      table.nextAttemptAt
+    ),
     index("notification_deliveries_created_idx").on(table.createdAt),
-  ],
+  ]
 )
 
 export const statusPageMonitors = sqliteTable("status_page_monitors", {

@@ -5,7 +5,10 @@ import {
   openDatabase,
   resolveSessionSecret,
 } from "./db/client"
-import { NotificationDispatcher, type NotificationSender } from "./notifications/dispatcher"
+import {
+  NotificationDispatcher,
+  type NotificationSender,
+} from "./notifications/dispatcher"
 import { RetentionService } from "./services/retention"
 import { MonitorScheduler, type MonitorChecker } from "./services/scheduler"
 
@@ -14,7 +17,10 @@ export type RuntimeOptions = {
   checker?: MonitorChecker
   notificationSender?: NotificationSender
 }
-export async function createRuntime(config: AppConfig, options: RuntimeOptions = {}) {
+export async function createRuntime(
+  config: AppConfig,
+  options: RuntimeOptions = {}
+) {
   await installPendingRestore(config)
   const client = await openDatabase(config)
   const sessionSecret = await resolveSessionSecret(config)
@@ -23,12 +29,12 @@ export async function createRuntime(config: AppConfig, options: RuntimeOptions =
     client.db,
     config.checkConcurrency,
     options.checker,
-    now,
+    now
   )
   const dispatcher = new NotificationDispatcher(
     client.db,
     options.notificationSender,
-    now,
+    now
   )
   const retention = new RetentionService(client.db, now)
 

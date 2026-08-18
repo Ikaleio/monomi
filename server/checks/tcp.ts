@@ -3,7 +3,7 @@ import type { CheckOutcome } from "./types"
 
 export async function runTcpCheck(
   monitor: Extract<MonitorInput, { type: "tcp" }>,
-  signal?: AbortSignal,
+  signal?: AbortSignal
 ): Promise<CheckOutcome> {
   const start = performance.now()
   return await new Promise<CheckOutcome>((resolve) => {
@@ -29,7 +29,10 @@ export async function runTcpCheck(
         errorMessage: message.slice(0, 500),
       })
     const abort = () => failure("TIMEOUT", "TCP 检测已取消")
-    const timeout = setTimeout(() => failure("TIMEOUT", "TCP 连接超时"), monitor.timeoutMs)
+    const timeout = setTimeout(
+      () => failure("TIMEOUT", "TCP 连接超时"),
+      monitor.timeoutMs
+    )
     signal?.addEventListener("abort", abort, { once: true })
     if (signal?.aborted) {
       abort()
@@ -51,8 +54,12 @@ export async function runTcpCheck(
         error(_socket, error) {
           const text = error.message.toLowerCase()
           failure(
-            text.includes("refused") ? "CONNECTION_REFUSED" : text.includes("dns") ? "DNS_ERROR" : "UNKNOWN_ERROR",
-            error.message,
+            text.includes("refused")
+              ? "CONNECTION_REFUSED"
+              : text.includes("dns")
+                ? "DNS_ERROR"
+                : "UNKNOWN_ERROR",
+            error.message
           )
         },
         close() {
@@ -66,8 +73,12 @@ export async function runTcpCheck(
       .catch((error: Error) => {
         const text = error.message.toLowerCase()
         failure(
-          text.includes("refused") ? "CONNECTION_REFUSED" : text.includes("dns") ? "DNS_ERROR" : "UNKNOWN_ERROR",
-          error.message,
+          text.includes("refused")
+            ? "CONNECTION_REFUSED"
+            : text.includes("dns")
+              ? "DNS_ERROR"
+              : "UNKNOWN_ERROR",
+          error.message
         )
       })
   })

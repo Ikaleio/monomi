@@ -14,7 +14,7 @@ export class RetentionService {
 
   constructor(
     private readonly db: AppDatabase,
-    private readonly now: () => Date = () => new Date(),
+    private readonly now: () => Date = () => new Date()
   ) {}
 
   start() {
@@ -29,14 +29,22 @@ export class RetentionService {
   }
 
   run(now = this.now()) {
-    const values = this.db.select().from(settings).where(eq(settings.id, 1)).get()
+    const values = this.db
+      .select()
+      .from(settings)
+      .where(eq(settings.id, 1))
+      .get()
     if (!values) return
-    const rawCutoff = new Date(now.getTime() - values.rawRetentionDays * 86400000)
-    const dailyCutoff = new Date(now.getTime() - values.dailyRetentionDays * 86400000)
+    const rawCutoff = new Date(
+      now.getTime() - values.rawRetentionDays * 86400000
+    )
+    const dailyCutoff = new Date(
+      now.getTime() - values.dailyRetentionDays * 86400000
+    )
       .toISOString()
       .slice(0, 10)
     const deliveryCutoff = new Date(
-      now.getTime() - values.notificationRetentionDays * 86400000,
+      now.getTime() - values.notificationRetentionDays * 86400000
     )
     this.db.transaction((tx) => {
       tx.delete(checks).where(lt(checks.checkedAt, rawCutoff)).run()

@@ -14,14 +14,22 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card"
-import { Field, FieldError, FieldGroup, FieldLabel } from "~/components/ui/field"
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "~/components/ui/field"
 import { Input } from "~/components/ui/input"
 import { Spinner } from "~/components/ui/spinner"
 import { api, ApiClientError, fetchJson } from "~/lib/api-client"
 import { loadAuthState } from "~/lib/auth-loader"
 
 export function meta() {
-  return [{ title: "首次设置 · Monomi" }, { name: "description", content: "创建 Monomi 管理员" }]
+  return [
+    { title: "首次设置 · Monomi" },
+    { name: "description", content: "创建 Monomi 管理员" },
+  ]
 }
 
 export async function clientLoader() {
@@ -58,19 +66,25 @@ export default function SetupRoute() {
       })
       navigate("/app", { replace: true })
     } catch (caught) {
-      setError(caught instanceof ApiClientError ? caught.message : "初始化失败，请稍后重试")
+      setError(
+        caught instanceof ApiClientError
+          ? caught.message
+          : "初始化失败，请稍后重试"
+      )
     } finally {
       setPending(false)
     }
   }
 
   return (
-    <main className="flex min-h-svh items-center justify-center bg-muted/45 p-5">
+    <main className="flex min-h-svh items-center justify-center bg-muted/45 px-3 py-5">
       <div className="flex w-full max-w-lg flex-col gap-6">
         <BrandMark />
         <Card>
           <CardHeader>
-            <CardTitle className="font-serif text-3xl">{t("setupTitle")}</CardTitle>
+            <CardTitle className="font-serif text-3xl">
+              {t("setupTitle")}
+            </CardTitle>
             <CardDescription>{t("setupDescription")}</CardDescription>
           </CardHeader>
           <form onSubmit={submit}>
@@ -113,7 +127,9 @@ export default function SetupRoute() {
                   />
                 </Field>
                 <Field data-invalid={mismatch}>
-                  <FieldLabel htmlFor="confirmation">{t("confirmPassword")}</FieldLabel>
+                  <FieldLabel htmlFor="confirmation">
+                    {t("confirmPassword")}
+                  </FieldLabel>
                   <Input
                     id="confirmation"
                     name="confirmation"
@@ -131,8 +147,16 @@ export default function SetupRoute() {
               </FieldGroup>
             </CardContent>
             <CardFooter className="pt-6">
-              <Button type="submit" className="w-full" disabled={pending || mismatch}>
-                {pending ? <Spinner data-icon="inline-start" /> : <UserRoundPlusIcon data-icon="inline-start" />}
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={pending || mismatch}
+              >
+                {pending ? (
+                  <Spinner data-icon="inline-start" />
+                ) : (
+                  <UserRoundPlusIcon data-icon="inline-start" />
+                )}
                 {pending ? t("saving") : t("createAdmin")}
               </Button>
             </CardFooter>

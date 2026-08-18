@@ -11,9 +11,17 @@ import {
 } from "../db/schema"
 import type { AppDeps, AppEnv } from "../http/types"
 
-const priority = { outage: 4, degraded: 3, operational: 2, pending: 1, paused: 0 } as const
+const priority = {
+  outage: 4,
+  degraded: 3,
+  operational: 2,
+  pending: 1,
+  paused: 0,
+} as const
 
-function availability(rows: Array<{ checkCount: number; successCount: number }>) {
+function availability(
+  rows: Array<{ checkCount: number; successCount: number }>
+) {
   const total = rows.reduce((sum, row) => sum + row.checkCount, 0)
   const success = rows.reduce((sum, row) => sum + row.successCount, 0)
   return total ? (success / total) * 100 : null
@@ -33,7 +41,7 @@ export function createPublicRoutes(deps: AppDeps) {
       .orderBy(asc(statusPageMonitors.sortOrder))
     const ids = selected.map((entry) => entry.monitor.id)
     const dayStart = new Date(
-      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 89),
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 89)
     )
     const last24 = new Date(now.getTime() - 86400000)
     const incidentSince = new Date(now.getTime() - 90 * 86400000)
@@ -45,13 +53,15 @@ export function createPublicRoutes(deps: AppDeps) {
             .where(
               and(
                 inArray(dailyStats.monitorId, ids),
-                gte(dailyStats.date, dayStart.toISOString().slice(0, 10)),
-              ),
+                gte(dailyStats.date, dayStart.toISOString().slice(0, 10))
+              )
             ),
           deps.db
             .select()
             .from(checks)
-            .where(and(inArray(checks.monitorId, ids), gte(checks.checkedAt, last24))),
+            .where(
+              and(inArray(checks.monitorId, ids), gte(checks.checkedAt, last24))
+            ),
           deps.db
             .select({
               id: incidents.id,
@@ -65,8 +75,8 @@ export function createPublicRoutes(deps: AppDeps) {
             .where(
               and(
                 inArray(incidents.monitorId, ids),
-                gte(incidents.startedAt, incidentSince),
-              ),
+                gte(incidents.startedAt, incidentSince)
+              )
             )
             .orderBy(desc(incidents.startedAt))
             .limit(50),
@@ -93,8 +103,16 @@ export function createPublicRoutes(deps: AppDeps) {
           checks: row.checkCount,
         }
       })
-      const days7 = ownStats.filter((row) => row.date >= new Date(now.getTime() - 7 * 86400000).toISOString().slice(0, 10))
-      const days30 = ownStats.filter((row) => row.date >= new Date(now.getTime() - 30 * 86400000).toISOString().slice(0, 10))
+      const days7 = ownStats.filter(
+        (row) =>
+          row.date >=
+          new Date(now.getTime() - 7 * 86400000).toISOString().slice(0, 10)
+      )
+      const days30 = ownStats.filter(
+        (row) =>
+          row.date >=
+          new Date(now.getTime() - 30 * 86400000).toISOString().slice(0, 10)
+      )
       return {
         id: monitor.id,
         name: monitor.name,
@@ -104,7 +122,7 @@ export function createPublicRoutes(deps: AppDeps) {
           appSettings.publicShowResponseTime && successfulChecks.length
             ? Math.round(
                 successfulChecks.reduce((sum, row) => sum + row.latencyMs, 0) /
-                  successfulChecks.length,
+                  successfulChecks.length
               )
             : null,
         uptime24h: ownChecks.length
@@ -120,14 +138,14 @@ export function createPublicRoutes(deps: AppDeps) {
         priority[entry.monitor.status] > priority[worst]
           ? entry.monitor.status
           : worst,
-      "pending" as keyof typeof priority,
+      "pending" as keyof typeof priority
     )
     const updatedAt = selected.reduce(
       (latest, entry) =>
         entry.monitor.lastCheckAt && entry.monitor.lastCheckAt > latest
           ? entry.monitor.lastCheckAt
           : latest,
-      appSettings.updatedAt,
+      appSettings.updatedAt
     )
     return c.json({
       enabled: true as const,
@@ -145,8 +163,10 @@ export function createPublicRoutes(deps: AppDeps) {
         durationSeconds: Math.max(
           0,
           Math.round(
-            ((incident.resolvedAt ?? now).getTime() - incident.startedAt.getTime()) / 1000,
-          ),
+            ((incident.resolvedAt ?? now).getTime() -
+              incident.startedAt.getTime()) /
+              1000
+          )
         ),
         title: `${incident.monitorName} 服务事件`,
         summary: incident.resolvedAt ? "服务已恢复" : "服务检测失败",

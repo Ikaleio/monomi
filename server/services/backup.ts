@@ -20,7 +20,10 @@ const requiredTables = [
 ]
 
 function timestamp(date = new Date()) {
-  const compact = date.toISOString().replace(/[-:TZ.]/g, "").slice(0, 14)
+  const compact = date
+    .toISOString()
+    .replace(/[-:TZ.]/g, "")
+    .slice(0, 14)
   return `${compact.slice(0, 8)}-${compact.slice(8)}`
 }
 
@@ -28,7 +31,11 @@ export function backupDirectory(config: AppConfig) {
   return path.join(config.dataDir, "backups")
 }
 
-export async function createBackup(sqlite: Database, config: AppConfig, prefix = "monomi") {
+export async function createBackup(
+  sqlite: Database,
+  config: AppConfig,
+  prefix = "monomi"
+) {
   const directory = backupDirectory(config)
   await mkdir(directory, { recursive: true, mode: 0o700 })
   sqlite.run("PRAGMA wal_checkpoint(PASSIVE)")
@@ -39,7 +46,9 @@ export async function createBackup(sqlite: Database, config: AppConfig, prefix =
 }
 
 export async function listBackups(config: AppConfig) {
-  const entries = await readdir(backupDirectory(config), { withFileTypes: true }).catch(() => [])
+  const entries = await readdir(backupDirectory(config), {
+    withFileTypes: true,
+  }).catch(() => [])
   return entries
     .filter((entry) => entry.isFile() && backupNamePattern.test(entry.name))
     .map((entry) => entry.name)
@@ -54,7 +63,9 @@ export function isSafeBackupFilename(filename: string) {
 export async function pruneBackups(config: AppConfig) {
   const entries = await listBackups(config)
   for (const filename of entries.slice(10)) {
-    await unlink(path.join(backupDirectory(config), filename)).catch(() => undefined)
+    await unlink(path.join(backupDirectory(config), filename)).catch(
+      () => undefined
+    )
   }
 }
 
@@ -62,11 +73,15 @@ export async function validateBackupFile(filePath: string) {
   const sqlite = new Database(filePath, { readonly: true, strict: true })
   try {
     const tableRows = sqlite
-      .query<{ name: string }, []>("SELECT name FROM sqlite_master WHERE type = 'table'")
+      .query<{ name: string }, []>(
+        "SELECT name FROM sqlite_master WHERE type = 'table'"
+      )
       .all()
     const names = new Set(tableRows.map((row) => row.name))
     if (requiredTables.some((table) => !names.has(table))) return false
-    const result = sqlite.query<{ integrity_check: string }, []>("PRAGMA integrity_check").get()
+    const result = sqlite
+      .query<{ integrity_check: string }, []>("PRAGMA integrity_check")
+      .get()
     return result?.integrity_check === "ok"
   } finally {
     sqlite.close()
@@ -86,10 +101,39 @@ export async function stageRestore(config: AppConfig, sourcePath: string) {
 export async function installPendingRestore(config: AppConfig) {
   const pendingPath = path.join(config.dataDir, "restore.pending.sqlite")
   if (!(await Bun.file(pendingPath).exists())) return false
+  await mkdir(backupDirectory(config), { recursive: true, mode: 0o700 })
+
+  let valid = false
+  try {
+    valid = await validateBackupFile(pendingPath)
+  } catch (error) {
+    console.error(
+      "Pending restore validation failed:",
+      error instanceof Error ? error.message : "unknown error"
+    )
+  }
+  if (!valid) {
+    const failedPath = path.join(
+      backupDirectory(config),
+      `failed-restore-${timestamp()}.db`
+    )
+    await rename(pendingPath, failedPath)
+    console.error("Pending restore rejected: SQLite validation failed")
+    return false
+  }
+
   const currentPath = config.databasePath
   if (await Bun.file(currentPath).exists()) {
-    const safetyPath = path.join(backupDirectory(config), `safety-${timestamp()}.db`)
-    await copyFile(currentPath, safetyPath)
+    const safetyPath = path.join(
+      backupDirectory(config),
+      `safety-${timestamp()}.db`
+    )
+    const current = new Database(currentPath, { readonly: true, strict: true })
+    try {
+      await Bun.write(safetyPath, current.serialize())
+    } finally {
+      current.close()
+    }
   }
   await unlink(`${currentPath}-wal`).catch(() => undefined)
   await unlink(`${currentPath}-shm`).catch(() => undefined)

@@ -1,24 +1,13 @@
 import { eq } from "drizzle-orm"
 import { Hono } from "hono"
-import {
-  deleteCookie,
-  getSignedCookie,
-  setSignedCookie,
-} from "hono/cookie"
+import { deleteCookie, getSignedCookie, setSignedCookie } from "hono/cookie"
 import type { Context } from "hono"
 
-import {
-  loginInputSchema,
-  setupInputSchema,
-} from "../../shared/contracts"
+import { loginInputSchema, setupInputSchema } from "../../shared/contracts"
 import { admins, sessions } from "../db/schema"
 import { ApiError } from "../http/errors"
 import type { AppDeps, AppEnv } from "../http/types"
-import {
-  SESSION_COOKIE,
-  sessionExpiresAt,
-  sha256,
-} from "../middleware/auth"
+import { SESSION_COOKIE, sessionExpiresAt, sha256 } from "../middleware/auth"
 
 async function parseJson(c: Context) {
   try {
@@ -29,9 +18,9 @@ async function parseJson(c: Context) {
 }
 
 async function issueSession(c: Context, deps: AppDeps, adminId: string) {
-  const token = Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString(
-    "base64url",
-  )
+  const token = Buffer.from(
+    crypto.getRandomValues(new Uint8Array(32))
+  ).toString("base64url")
   const now = deps.now?.() ?? new Date()
   const expiresAt = sessionExpiresAt(now)
   await deps.db.insert(sessions).values({
@@ -117,7 +106,10 @@ export function createAuthRoutes(deps: AppDeps) {
       const admin = await deps.db.query.admins.findFirst({
         where: eq(admins.username, input.username),
       })
-      if (!admin || !(await Bun.password.verify(input.password, admin.passwordHash))) {
+      if (
+        !admin ||
+        !(await Bun.password.verify(input.password, admin.passwordHash))
+      ) {
         throw new ApiError(401, "INVALID_CREDENTIALS", "用户名或密码错误")
       }
       await issueSession(c, deps, admin.id)
@@ -126,7 +118,9 @@ export function createAuthRoutes(deps: AppDeps) {
     .post("/auth/logout", async (c) => {
       const token = await getSignedCookie(c, deps.sessionSecret, SESSION_COOKIE)
       if (token && typeof token === "string") {
-        await deps.db.delete(sessions).where(eq(sessions.tokenHash, await sha256(token)))
+        await deps.db
+          .delete(sessions)
+          .where(eq(sessions.tokenHash, await sha256(token)))
       }
       deleteCookie(c, SESSION_COOKIE, {
         path: "/",

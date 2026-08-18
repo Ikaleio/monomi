@@ -51,13 +51,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         setThemeState(next)
       },
     }),
-    [theme],
+    [theme]
   )
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }
 
 export function useThemeMode() {
   const context = useContext(ThemeContext)
-  if (!context) throw new Error("useThemeMode must be used inside ThemeProvider")
+  if (!context)
+    throw new Error("useThemeMode must be used inside ThemeProvider")
   return context
 }

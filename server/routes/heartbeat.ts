@@ -11,7 +11,8 @@ export function createHeartbeatRoutes(deps: AppDeps) {
     const monitor = await deps.db.query.monitors.findFirst({
       where: eq(monitors.heartbeatTokenHash, tokenHash),
     })
-    if (!monitor || monitor.type !== "heartbeat" || !monitor.enabled) return null
+    if (!monitor || monitor.type !== "heartbeat" || !monitor.enabled)
+      return null
     await deps.scheduler.recordHeartbeat(monitor.id)
     return monitor
   }

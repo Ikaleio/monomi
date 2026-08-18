@@ -34,9 +34,9 @@ export const headersSchema = z
   .refine(
     (headers) =>
       Object.keys(headers).every(
-        (name) => !forbiddenHeaders.has(name.toLowerCase()),
+        (name) => !forbiddenHeaders.has(name.toLowerCase())
       ),
-    "请求头包含不允许覆盖的名称",
+    "请求头包含不允许覆盖的名称"
   )
 
 const commonMonitorShape = {
@@ -45,7 +45,13 @@ const commonMonitorShape = {
   intervalSeconds: z.number().int().min(30).max(3600),
   timeoutMs: z.number().int().min(1000).max(30000),
   failureThreshold: z.number().int().min(1).max(5),
-  latencyThresholdMs: z.number().int().min(100).max(60000).nullable().optional(),
+  latencyThresholdMs: z
+    .number()
+    .int()
+    .min(100)
+    .max(60000)
+    .nullable()
+    .optional(),
   enabled: z.boolean().default(true),
 } as const
 
@@ -125,14 +131,17 @@ export const settingsInputSchema = z
     publicShowResponseTime: z.boolean(),
   })
   .strict()
-  .refine((value) => {
-    try {
-      new Intl.DateTimeFormat("zh-CN", { timeZone: value.timezone }).format()
-      return true
-    } catch {
-      return false
-    }
-  }, { path: ["timezone"], message: "无效时区" })
+  .refine(
+    (value) => {
+      try {
+        new Intl.DateTimeFormat("zh-CN", { timeZone: value.timezone }).format()
+        return true
+      } catch {
+        return false
+      }
+    },
+    { path: ["timezone"], message: "无效时区" }
+  )
 export type SettingsInput = z.infer<typeof settingsInputSchema>
 
 export const webhookInputSchema = z
@@ -188,7 +197,9 @@ export const statusPageInputSchema = z
 
 export const configNotificationSchema = webhookInputSchema
   .omit({ monitorIds: true })
-  .extend({ monitorNames: z.array(z.string().min(1).max(80)).max(500).nullable() })
+  .extend({
+    monitorNames: z.array(z.string().min(1).max(80)).max(500).nullable(),
+  })
 
 export const configDocumentSchema = z
   .object({

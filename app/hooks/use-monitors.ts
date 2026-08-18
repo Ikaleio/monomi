@@ -3,7 +3,10 @@ import useSWR from "swr"
 
 import { api, swrConfig, unwrap } from "~/lib/api-client"
 
-export type MonitorsData = InferResponseType<typeof api.admin.monitors.$get, 200>
+export type MonitorsData = InferResponseType<
+  typeof api.admin.monitors.$get,
+  200
+>
 export type MonitorDetailData = InferResponseType<
   (typeof api.admin.monitors)[":id"]["$get"],
   200
@@ -17,7 +20,7 @@ export function useMonitors() {
   return useSWR<MonitorsData>(
     "monitors",
     async () => unwrap(await api.admin.monitors.$get()),
-    { ...swrConfig, refreshInterval: 10000 },
+    { ...swrConfig, refreshInterval: 10000 }
   )
 }
 
@@ -26,9 +29,9 @@ export function useMonitor(id?: string) {
     id ? ["monitor", id] : null,
     async () =>
       unwrap(
-        await api.admin.monitors[":id"].$get({ param: { id: id as string } }),
+        await api.admin.monitors[":id"].$get({ param: { id: id as string } })
       ),
-    { ...swrConfig, refreshInterval: 10000 },
+    { ...swrConfig, refreshInterval: 10000 }
   )
 }
 
@@ -44,6 +47,6 @@ export function useMonitorActivity(id?: string) {
       ])
       return { checks, metrics, history }
     },
-    { ...swrConfig, refreshInterval: 10000 },
+    { ...swrConfig, refreshInterval: 10000 }
   )
 }

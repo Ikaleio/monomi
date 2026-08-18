@@ -3,11 +3,10 @@ import tls from "node:tls"
 import type { MonitorInput } from "../../shared/contracts"
 
 export type CertificateOutcome =
-  | { success: true; expiresAt: Date }
-  | { success: false; error: string }
+  { success: true; expiresAt: Date } | { success: false; error: string }
 
 export function checkCertificate(
-  monitor: Extract<MonitorInput, { type: "http" }>,
+  monitor: Extract<MonitorInput, { type: "http" }>
 ): Promise<CertificateOutcome> {
   const url = new URL(monitor.url)
   if (url.protocol !== "https:") {
@@ -30,7 +29,7 @@ export function checkCertificate(
     })
     const timer = setTimeout(
       () => finish({ success: false, error: "证书连接超时" }),
-      monitor.timeoutMs,
+      monitor.timeoutMs
     )
     socket.once("secureConnect", () => {
       const certificate = socket.getPeerCertificate()
@@ -42,7 +41,7 @@ export function checkCertificate(
       finish({ success: true, expiresAt })
     })
     socket.once("error", (error: Error) =>
-      finish({ success: false, error: error.message.slice(0, 500) }),
+      finish({ success: false, error: error.message.slice(0, 500) })
     )
   })
 }

@@ -18,8 +18,8 @@ export async function ensureDataDirectories(dataDir: string) {
       mkdir(entry === dataDir ? entry : path.join(dataDir, entry), {
         recursive: true,
         mode: 0o700,
-      }),
-    ),
+      })
+    )
   )
 }
 
@@ -33,7 +33,9 @@ export async function openDatabase(config: AppConfig): Promise<DatabaseClient> {
   sqlite.run("PRAGMA journal_mode = WAL")
   sqlite.run("PRAGMA busy_timeout = 5000")
   const db = drizzle(sqlite, { schema })
-  migrate(db, { migrationsFolder: path.resolve(import.meta.dir, "../../drizzle") })
+  migrate(db, {
+    migrationsFolder: path.resolve(import.meta.dir, "../../drizzle"),
+  })
   await seedDefaultSettings(db)
   return { sqlite, db }
 }
@@ -73,20 +75,28 @@ export async function resolveSessionSecret(config: AppConfig): Promise<string> {
     const existing = (await readFile(secretPath, "utf8")).trim()
     if (existing.length >= 32) return existing
   } catch (error) {
-    if (!(error instanceof Error && "code" in error && error.code === "ENOENT")) {
+    if (!(
+      error instanceof Error &&
+      "code" in error &&
+      error.code === "ENOENT"
+    )) {
       throw error
     }
   }
-  const secret = Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString(
-    "base64url",
-  )
+  const secret = Buffer.from(
+    crypto.getRandomValues(new Uint8Array(32))
+  ).toString("base64url")
   await writeFile(secretPath, `${secret}\n`, { mode: 0o600, flag: "wx" }).catch(
     async (error) => {
-      if (error instanceof Error && "code" in error && error.code === "EEXIST") {
+      if (
+        error instanceof Error &&
+        "code" in error &&
+        error.code === "EEXIST"
+      ) {
         return
       }
       throw error
-    },
+    }
   )
   await chmod(secretPath, 0o600)
   return (await readFile(secretPath, "utf8")).trim()

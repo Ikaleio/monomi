@@ -14,7 +14,9 @@ const envSchema = z.object({
   MONOMI_SESSION_SECRET: z.string().min(32).optional(),
   MONOMI_SECURE_COOKIE: booleanString,
   MONOMI_CHECK_CONCURRENCY: z.coerce.number().int().min(1).max(100).default(10),
-  NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  NODE_ENV: z
+    .enum(["development", "test", "production"])
+    .default("development"),
 })
 
 export type AppConfig = {
@@ -29,7 +31,9 @@ export type AppConfig = {
   environment: "development" | "test" | "production"
 }
 
-export function parseConfig(env: Record<string, string | undefined> = process.env): AppConfig {
+export function parseConfig(
+  env: Record<string, string | undefined> = process.env
+): AppConfig {
   const parsed = envSchema.parse(env)
   const dataDir = path.resolve(parsed.MONOMI_DATA_DIR)
   return {

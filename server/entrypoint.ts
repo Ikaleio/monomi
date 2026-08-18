@@ -1,20 +1,30 @@
-import { chown, mkdir } from "node:fs/promises"
+import { lchown, mkdir, readdir } from "node:fs/promises"
+import path from "node:path"
+
+import { startServer } from "./index"
 
 const dataDir = process.env.MONOMI_DATA_DIR ?? "/data"
-const isRoot = process.getuid?.() === 0
+
+async function chownTree(directory: string, uid: number, gid: number) {
+  const entries = await readdir(directory, { withFileTypes: true })
+  for (const entry of entries) {
+    const entryPath = path.join(directory, entry.name)
+    if (entry.isDirectory()) await chownTree(entryPath, uid, gid)
+    await lchown(entryPath, uid, gid)
+  }
+  await lchown(directory, uid, gid)
+}
 
 await mkdir(dataDir, { recursive: true })
-if (isRoot) await chown(dataDir, 1000, 1000)
+const { getuid, setgroups, setgid, setuid } = process
+if (getuid?.() === 0) {
+  if (!setgroups || !setgid || !setuid) {
+    throw new Error("This platform cannot drop root privileges")
+  }
+  await chownTree(dataDir, 1000, 1000)
+  setgroups([])
+  setgid(1000)
+  setuid(1000)
+}
 
-const server = Bun.spawn(["bun", "server/index.ts"], {
-  cwd: process.cwd(),
-  env: process.env,
-  stdin: "inherit",
-  stdout: "inherit",
-  stderr: "inherit",
-  ...(isRoot ? { uid: 1000, gid: 1000 } : {}),
-})
-
-process.on("SIGINT", () => server.kill("SIGINT"))
-process.on("SIGTERM", () => server.kill("SIGTERM"))
-process.exit(await server.exited)
+await startServer()

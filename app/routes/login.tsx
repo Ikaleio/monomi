@@ -26,7 +26,10 @@ import { api, ApiClientError, fetchJson } from "~/lib/api-client"
 import { loadAuthState, safeNext } from "~/lib/auth-loader"
 
 export function meta() {
-  return [{ title: "登录 · Monomi" }, { name: "description", content: "登录 Monomi 管理后台" }]
+  return [
+    { title: "登录 · Monomi" },
+    { name: "description", content: "登录 Monomi 管理后台" },
+  ]
 }
 
 export async function clientLoader({ request }: { request: Request }) {
@@ -58,19 +61,25 @@ export default function LoginRoute() {
       })
       navigate(next, { replace: true })
     } catch (caught) {
-      setError(caught instanceof ApiClientError ? caught.message : "登录失败，请稍后重试")
+      setError(
+        caught instanceof ApiClientError
+          ? caught.message
+          : "登录失败，请稍后重试"
+      )
     } finally {
       setPending(false)
     }
   }
 
   return (
-    <main className="flex min-h-svh items-center justify-center bg-muted/45 p-5">
+    <main className="flex min-h-svh items-center justify-center bg-muted/45 px-3 py-5">
       <div className="flex w-full max-w-md flex-col gap-6">
         <BrandMark />
         <Card>
           <CardHeader>
-            <CardTitle className="font-serif text-3xl">{t("loginTitle")}</CardTitle>
+            <CardTitle className="font-serif text-3xl">
+              {t("loginTitle")}
+            </CardTitle>
             <CardDescription>{t("loginDescription")}</CardDescription>
           </CardHeader>
           <form onSubmit={submit}>
@@ -117,7 +126,11 @@ export default function LoginRoute() {
             </CardContent>
             <CardFooter className="pt-6">
               <Button type="submit" className="w-full" disabled={pending}>
-                {pending ? <Spinner data-icon="inline-start" /> : <LogInIcon data-icon="inline-start" />}
+                {pending ? (
+                  <Spinner data-icon="inline-start" />
+                ) : (
+                  <LogInIcon data-icon="inline-start" />
+                )}
                 {pending ? t("loggingIn") : t("login")}
               </Button>
             </CardFooter>

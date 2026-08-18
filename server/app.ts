@@ -69,7 +69,7 @@ export function createApp(deps: AppDeps) {
     await next()
     const duration = Math.round(performance.now() - startedAt)
     console.info(
-      `${c.req.method} ${safePath(new URL(c.req.url).pathname)} ${c.res.status} ${duration}ms`,
+      `${c.req.method} ${safePath(new URL(c.req.url).pathname)} ${c.res.status} ${duration}ms`
     )
   })
   app.use("*", async (c, next) => {
@@ -94,7 +94,7 @@ export function createApp(deps: AppDeps) {
           scheduler: "stopped",
           version: packageJson.version,
         },
-        503,
+        503
       )
     }
     return c.json({
@@ -122,7 +122,7 @@ export function createApp(deps: AppDeps) {
     return c.text("Not Found", 404)
   })
   app.onError((error, c) =>
-    handleError(error, c, deps.config.environment === "production"),
+    handleError(error, c, deps.config.environment === "production")
   )
   return app
 }

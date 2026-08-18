@@ -25,13 +25,20 @@ import { useThemeMode, type ThemeMode } from "~/hooks/use-theme"
 import { api, unwrap } from "~/lib/api-client"
 import { setLocale, type Locale } from "~/lib/i18n"
 
-const themes: Array<{ value: ThemeMode; labelKey: "light" | "dark" | "system"; icon: typeof SunIcon }> = [
+const themes: Array<{
+  value: ThemeMode
+  labelKey: "light" | "dark" | "system"
+  icon: typeof SunIcon
+}> = [
   { value: "light", labelKey: "light", icon: SunIcon },
   { value: "dark", labelKey: "dark", icon: MoonIcon },
   { value: "system", labelKey: "system", icon: MonitorIcon },
 ]
 
-const languages: Array<{ value: Locale; labelKey: "chinese" | "english" | "japanese" }> = [
+const languages: Array<{
+  value: Locale
+  labelKey: "chinese" | "english" | "japanese"
+}> = [
   { value: "zh-CN", labelKey: "chinese" },
   { value: "en", labelKey: "english" },
   { value: "ja", labelKey: "japanese" },
@@ -41,7 +48,8 @@ export function UtilityMenus({ showLogout = false }: { showLogout?: boolean }) {
   const { theme, setTheme } = useThemeMode()
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
-  const ThemeIcon = themes.find((item) => item.value === theme)?.icon ?? MonitorIcon
+  const ThemeIcon =
+    themes.find((item) => item.value === theme)?.icon ?? MonitorIcon
 
   async function logout() {
     try {
@@ -65,9 +73,14 @@ export function UtilityMenus({ showLogout = false }: { showLogout?: boolean }) {
           <DropdownMenuGroup>
             <DropdownMenuLabel>{t("language")}</DropdownMenuLabel>
             {languages.map((item) => (
-              <DropdownMenuItem key={item.value} onSelect={() => void setLocale(item.value)}>
+              <DropdownMenuItem
+                key={item.value}
+                onSelect={() => void setLocale(item.value)}
+              >
                 <span>{t(item.labelKey)}</span>
-                {i18n.language === item.value && <CheckIcon className="ml-auto" aria-hidden="true" />}
+                {i18n.language === item.value && (
+                  <CheckIcon className="ml-auto" aria-hidden="true" />
+                )}
               </DropdownMenuItem>
             ))}
           </DropdownMenuGroup>
@@ -86,10 +99,15 @@ export function UtilityMenus({ showLogout = false }: { showLogout?: boolean }) {
             {themes.map((item) => {
               const Icon = item.icon
               return (
-                <DropdownMenuItem key={item.value} onSelect={() => setTheme(item.value)}>
+                <DropdownMenuItem
+                  key={item.value}
+                  onSelect={() => setTheme(item.value)}
+                >
                   <Icon aria-hidden="true" />
                   {t(item.labelKey)}
-                  {theme === item.value && <CheckIcon className="ml-auto" aria-hidden="true" />}
+                  {theme === item.value && (
+                    <CheckIcon className="ml-auto" aria-hidden="true" />
+                  )}
                 </DropdownMenuItem>
               )
             })}
@@ -100,7 +118,12 @@ export function UtilityMenus({ showLogout = false }: { showLogout?: boolean }) {
       {showLogout && (
         <>
           <Separator orientation="vertical" className="mx-1 h-5" />
-          <Button variant="ghost" size="icon" aria-label={t("logout")} onClick={logout}>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={t("logout")}
+            onClick={logout}
+          >
             <LogOutIcon aria-hidden="true" />
           </Button>
         </>

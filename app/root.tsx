@@ -58,7 +58,7 @@ export default function App() {
 
 export function HydrateFallback() {
   return (
-    <main className="flex min-h-svh items-center justify-center bg-background p-6">
+    <main className="flex min-h-svh items-center justify-center bg-background px-3 py-6">
       <div className="flex flex-col items-center gap-4 text-center">
         <BrandMark />
         <p className="text-sm text-muted-foreground">正在载入运行状态…</p>
@@ -74,14 +74,15 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 
   if (isRouteErrorResponse(error)) {
     message = error.status === 404 ? "找不到页面" : "请求失败"
-    details = error.status === 404 ? "请求的页面不存在。" : error.statusText || details
+    details =
+      error.status === 404 ? "请求的页面不存在。" : error.statusText || details
   } else if (import.meta.env.DEV && error instanceof Error) {
     details = error.message
     stack = error.stack
   }
 
   return (
-    <main className="container mx-auto flex min-h-svh max-w-3xl flex-col gap-4 p-6 pt-20">
+    <main className="container mx-auto flex min-h-svh max-w-3xl flex-col gap-4 px-3 pt-20 pb-6 md:px-8">
       <BrandMark />
       <h1 className="font-serif text-4xl font-semibold">{message}</h1>
       <p className="text-muted-foreground">{details}</p>

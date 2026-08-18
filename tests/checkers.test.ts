@@ -13,7 +13,11 @@ beforeAll(() => {
     port: 0,
     async fetch(request) {
       const path = new URL(request.url).pathname
-      if (path === "/redirect") return Response.redirect(new URL("/ok", request.url), 302)
+      if (path === "/redirect")
+        return Response.redirect(new URL("/ok", request.url), 302)
+      if (path === "/redirect-loop")
+        return Response.redirect(new URL("/redirect-loop", request.url), 302)
+      if (path === "/status") return new Response("FAILED", { status: 503 })
       if (path === "/large") return new Response("x".repeat(1024 * 1024 + 1))
       if (path === "/slow") {
         await Bun.sleep(100)
@@ -29,10 +33,23 @@ afterAll(() => fixture.stop(true))
 
 function httpMonitor(url: string): Extract<MonitorInput, { type: "http" }> {
   return {
-    type: "http", name: "fixture", description: "", intervalSeconds: 30,
-    timeoutMs: 1000, failureThreshold: 2, latencyThresholdMs: null, enabled: true,
-    url, method: "GET", headers: {}, body: null, expectedStatusMin: 200,
-    expectedStatusMax: 299, keyword: "READY", followRedirects: true, validateTls: true,
+    type: "http",
+    name: "fixture",
+    description: "",
+    intervalSeconds: 30,
+    timeoutMs: 1000,
+    failureThreshold: 2,
+    latencyThresholdMs: null,
+    enabled: true,
+    url,
+    method: "GET",
+    headers: {},
+    body: null,
+    expectedStatusMin: 200,
+    expectedStatusMax: 299,
+    keyword: "READY",
+    followRedirects: true,
+    validateTls: true,
   }
 }
 
@@ -44,15 +61,55 @@ describe("bounded checkers", () => {
   })
 
   test("enforces keyword and response size", async () => {
-    const missing = await runHttpCheck({ ...httpMonitor(`${baseUrl}/ok`), keyword: "MISSING" })
+    const missing = await runHttpCheck({
+      ...httpMonitor(`${baseUrl}/ok`),
+      keyword: "MISSING",
+    })
     const large = await runHttpCheck(httpMonitor(`${baseUrl}/large`))
     expect(missing.errorCode).toBe("KEYWORD_MISSING")
     expect(large.errorCode).toBe("RESPONSE_TOO_LARGE")
   })
 
+  test("enforces status, redirect, and timeout limits", async () => {
+    const status = await runHttpCheck(httpMonitor(`${baseUrl}/status`))
+    const redirects = await runHttpCheck(
+      httpMonitor(`${baseUrl}/redirect-loop`)
+    )
+    const timeout = await runHttpCheck({
+      ...httpMonitor(`${baseUrl}/slow`),
+      timeoutMs: 20,
+    })
+
+    expect(status.errorCode).toBe("STATUS_MISMATCH")
+    expect(redirects.errorCode).toBe("TOO_MANY_REDIRECTS")
+    expect(timeout.errorCode).toBe("TIMEOUT")
+  })
+
   test("connects TCP and reports refused ports", async () => {
-    const success = await runTcpCheck({ type: "tcp", name: "tcp", description: "", intervalSeconds: 30, timeoutMs: 1000, failureThreshold: 2, latencyThresholdMs: null, enabled: true, host: "127.0.0.1", port: fixture.port! })
-    const refused = await runTcpCheck({ type: "tcp", name: "tcp", description: "", intervalSeconds: 30, timeoutMs: 200, failureThreshold: 2, latencyThresholdMs: null, enabled: true, host: "127.0.0.1", port: 1 })
+    const success = await runTcpCheck({
+      type: "tcp",
+      name: "tcp",
+      description: "",
+      intervalSeconds: 30,
+      timeoutMs: 1000,
+      failureThreshold: 2,
+      latencyThresholdMs: null,
+      enabled: true,
+      host: "127.0.0.1",
+      port: fixture.port!,
+    })
+    const refused = await runTcpCheck({
+      type: "tcp",
+      name: "tcp",
+      description: "",
+      intervalSeconds: 30,
+      timeoutMs: 200,
+      failureThreshold: 2,
+      latencyThresholdMs: null,
+      enabled: true,
+      host: "127.0.0.1",
+      port: 1,
+    })
     expect(success.success).toBe(true)
     expect(refused.success).toBe(false)
   })

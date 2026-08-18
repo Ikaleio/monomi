@@ -38,8 +38,8 @@ export function createIncidentRoutes(deps: AppDeps) {
           Math.round(
             ((incident.resolvedAt ?? deps.now?.() ?? new Date()).getTime() -
               incident.startedAt.getTime()) /
-              1000,
-          ),
+              1000
+          )
         ),
       })),
       nextCursor: hasMore ? items.at(-1)?.id : null,

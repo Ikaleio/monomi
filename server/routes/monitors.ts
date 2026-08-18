@@ -1,16 +1,8 @@
 import { and, asc, desc, eq, gte, lt } from "drizzle-orm"
 import { Hono } from "hono"
 
-import {
-  monitorInputSchema,
-  paginationSchema,
-} from "../../shared/contracts"
-import {
-  checks,
-  dailyStats,
-  incidents,
-  monitors,
-} from "../db/schema"
+import { monitorInputSchema, paginationSchema } from "../../shared/contracts"
+import { checks, dailyStats, incidents, monitors } from "../db/schema"
 import { ApiError } from "../http/errors"
 import type { AppDeps, AppEnv } from "../http/types"
 import { sha256 } from "../middleware/auth"
@@ -21,7 +13,9 @@ import {
 } from "../services/monitors"
 
 function randomToken() {
-  return Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString("base64url")
+  return Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString(
+    "base64url"
+  )
 }
 
 async function getMonitor(deps: AppDeps, id: string) {
@@ -40,18 +34,26 @@ async function parseJson(c: { req: { json(): Promise<unknown> } }) {
   }
 }
 
-async function resolveIncident(deps: AppDeps, monitorId: string, resolution: string) {
+async function resolveIncident(
+  deps: AppDeps,
+  monitorId: string,
+  resolution: string
+) {
   const now = deps.now?.() ?? new Date()
   await deps.db
     .update(incidents)
     .set({ status: "resolved", resolvedAt: now, resolution })
-    .where(and(eq(incidents.monitorId, monitorId), eq(incidents.status, "ongoing")))
+    .where(
+      and(eq(incidents.monitorId, monitorId), eq(incidents.status, "ongoing"))
+    )
 }
 
 export function createMonitorRoutes(deps: AppDeps) {
   return new Hono<AppEnv>()
     .get("/", async (c) => {
-      const rows = await deps.db.query.monitors.findMany({ orderBy: asc(monitors.name) })
+      const rows = await deps.db.query.monitors.findMany({
+        orderBy: asc(monitors.name),
+      })
       return c.json({ monitors: rows.map(monitorView) })
     })
     .post("/", async (c) => {
@@ -69,7 +71,9 @@ export function createMonitorRoutes(deps: AppDeps) {
         timeoutMs: input.timeoutMs,
         failureThreshold: input.failureThreshold,
         latencyThresholdMs: input.latencyThresholdMs ?? null,
-        heartbeatTokenHash: heartbeatToken ? await sha256(heartbeatToken) : null,
+        heartbeatTokenHash: heartbeatToken
+          ? await sha256(heartbeatToken)
+          : null,
         enabled: input.enabled,
         status: input.enabled ? "pending" : "paused",
         consecutiveFailures: 0,
@@ -85,10 +89,14 @@ export function createMonitorRoutes(deps: AppDeps) {
             ? { heartbeatPath: `/api/heartbeat/${heartbeatToken}` }
             : {}),
         },
-        201,
+        201
       )
     })
-    .get("/:id", async (c) => c.json({ monitor: monitorView(await getMonitor(deps, c.req.param("id"))) }))
+    .get("/:id", async (c) =>
+      c.json({
+        monitor: monitorView(await getMonitor(deps, c.req.param("id"))),
+      })
+    )
     .patch("/:id", async (c) => {
       const id = c.req.param("id")
       const existing = await getMonitor(deps, id)
@@ -99,7 +107,8 @@ export function createMonitorRoutes(deps: AppDeps) {
       const now = deps.now?.() ?? new Date()
       const previous = monitorInputFromRow(existing)
       const checkConfigChanged =
-        JSON.stringify(monitorConfig(previous)) !== JSON.stringify(monitorConfig(input)) ||
+        JSON.stringify(monitorConfig(previous)) !==
+          JSON.stringify(monitorConfig(input)) ||
         previous.intervalSeconds !== input.intervalSeconds ||
         previous.timeoutMs !== input.timeoutMs ||
         previous.failureThreshold !== input.failureThreshold ||
@@ -150,19 +159,30 @@ export function createMonitorRoutes(deps: AppDeps) {
     .post("/:id/run", async (c) => {
       const monitor = await getMonitor(deps, c.req.param("id"))
       if (monitor.type === "heartbeat") {
-        throw new ApiError(400, "HEARTBEAT_MANUAL_RUN_UNSUPPORTED", "Heartbeat 不支持手动检测")
+        throw new ApiError(
+          400,
+          "HEARTBEAT_MANUAL_RUN_UNSUPPORTED",
+          "Heartbeat 不支持手动检测"
+        )
       }
       return c.json({ outcome: await deps.scheduler.runNow(monitor.id) })
     })
     .post("/:id/heartbeat-token", async (c) => {
       const monitor = await getMonitor(deps, c.req.param("id"))
       if (monitor.type !== "heartbeat") {
-        throw new ApiError(400, "NOT_HEARTBEAT_MONITOR", "该监视器不是 Heartbeat")
+        throw new ApiError(
+          400,
+          "NOT_HEARTBEAT_MONITOR",
+          "该监视器不是 Heartbeat"
+        )
       }
       const token = randomToken()
       await deps.db
         .update(monitors)
-        .set({ heartbeatTokenHash: await sha256(token), updatedAt: deps.now?.() ?? new Date() })
+        .set({
+          heartbeatTokenHash: await sha256(token),
+          updatedAt: deps.now?.() ?? new Date(),
+        })
         .where(eq(monitors.id, monitor.id))
       return c.json({ heartbeatPath: `/api/heartbeat/${token}` })
     })
@@ -179,20 +199,30 @@ export function createMonitorRoutes(deps: AppDeps) {
         .limit(query.limit + 1)
       const hasMore = rows.length > query.limit
       const items = hasMore ? rows.slice(0, query.limit) : rows
-      return c.json({ checks: items, nextCursor: hasMore ? items.at(-1)?.id : null })
+      return c.json({
+        checks: items,
+        nextCursor: hasMore ? items.at(-1)?.id : null,
+      })
     })
     .get("/:id/metrics", async (c) => {
       const monitor = await getMonitor(deps, c.req.param("id"))
       if ((c.req.query("window") ?? "24h") !== "24h") {
         throw new ApiError(400, "INVALID_WINDOW", "仅支持 24h 时间窗口")
       }
-      const since = new Date((deps.now?.() ?? new Date()).getTime() - 24 * 60 * 60 * 1000)
+      const since = new Date(
+        (deps.now?.() ?? new Date()).getTime() - 24 * 60 * 60 * 1000
+      )
       const rows = await deps.db
         .select()
         .from(checks)
-        .where(and(eq(checks.monitorId, monitor.id), gte(checks.checkedAt, since)))
+        .where(
+          and(eq(checks.monitorId, monitor.id), gte(checks.checkedAt, since))
+        )
         .orderBy(asc(checks.checkedAt))
-      const buckets = new Map<number, { total: number; count: number; failures: number }>()
+      const buckets = new Map<
+        number,
+        { total: number; count: number; failures: number }
+      >()
       for (const row of rows) {
         const time = Math.floor(row.checkedAt.getTime() / 300000) * 300000
         const bucket = buckets.get(time) ?? { total: 0, count: 0, failures: 0 }
@@ -213,19 +243,34 @@ export function createMonitorRoutes(deps: AppDeps) {
     .get("/:id/history", async (c) => {
       const monitor = await getMonitor(deps, c.req.param("id"))
       const days = Math.min(90, Math.max(1, Number(c.req.query("days") ?? 90)))
-      if (!Number.isInteger(days)) throw new ApiError(400, "INVALID_DAYS", "天数必须为整数")
+      if (!Number.isInteger(days))
+        throw new ApiError(400, "INVALID_DAYS", "天数必须为整数")
       const end = deps.now?.() ?? new Date()
-      const start = new Date(Date.UTC(end.getUTCFullYear(), end.getUTCMonth(), end.getUTCDate() - days + 1))
+      const start = new Date(
+        Date.UTC(
+          end.getUTCFullYear(),
+          end.getUTCMonth(),
+          end.getUTCDate() - days + 1
+        )
+      )
       const startDate = start.toISOString().slice(0, 10)
       const rows = await deps.db
         .select()
         .from(dailyStats)
-        .where(and(eq(dailyStats.monitorId, monitor.id), gte(dailyStats.date, startDate)))
+        .where(
+          and(
+            eq(dailyStats.monitorId, monitor.id),
+            gte(dailyStats.date, startDate)
+          )
+        )
       const byDate = new Map(rows.map((row) => [row.date, row]))
       const history = Array.from({ length: days }, (_, index) => {
-        const date = new Date(start.getTime() + index * 86400000).toISOString().slice(0, 10)
+        const date = new Date(start.getTime() + index * 86400000)
+          .toISOString()
+          .slice(0, 10)
         const row = byDate.get(date)
-        if (!row || row.checkCount === 0) return { date, status: "pending" as const, uptime: null, checks: 0 }
+        if (!row || row.checkCount === 0)
+          return { date, status: "pending" as const, uptime: null, checks: 0 }
         return {
           date,
           status: row.worstStatus,

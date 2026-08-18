@@ -4,11 +4,7 @@ import { unlink } from "node:fs/promises"
 import path from "node:path"
 
 import { statusPageInputSchema } from "../../shared/contracts"
-import {
-  monitors,
-  settings,
-  statusPageMonitors,
-} from "../db/schema"
+import { monitors, settings, statusPageMonitors } from "../db/schema"
 import { ApiError } from "../http/errors"
 import type { AppDeps, AppEnv } from "../http/types"
 
@@ -19,20 +15,29 @@ function imageType(bytes: Uint8Array) {
     bytes[1] === 0x50 &&
     bytes[2] === 0x4e &&
     bytes[3] === 0x47
-  ) return { mime: "image/png", extension: "png" }
-  if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) {
+  )
+    return { mime: "image/png", extension: "png" }
+  if (
+    bytes.length >= 3 &&
+    bytes[0] === 0xff &&
+    bytes[1] === 0xd8 &&
+    bytes[2] === 0xff
+  ) {
     return { mime: "image/jpeg", extension: "jpg" }
   }
   if (
     bytes.length >= 12 &&
     new TextDecoder().decode(bytes.slice(0, 4)) === "RIFF" &&
     new TextDecoder().decode(bytes.slice(8, 12)) === "WEBP"
-  ) return { mime: "image/webp", extension: "webp" }
+  )
+    return { mime: "image/webp", extension: "webp" }
   return null
 }
 
 async function currentSettings(deps: AppDeps) {
-  const row = await deps.db.query.settings.findFirst({ where: eq(settings.id, 1) })
+  const row = await deps.db.query.settings.findFirst({
+    where: eq(settings.id, 1),
+  })
   if (!row) throw new ApiError(500, "SETTINGS_MISSING", "系统设置尚未初始化")
   return row
 }
@@ -40,7 +45,9 @@ async function currentSettings(deps: AppDeps) {
 async function removeLogoFile(deps: AppDeps, logoPath: string | null) {
   if (!logoPath) return
   const filename = path.basename(logoPath)
-  await unlink(path.join(deps.config.dataDir, "uploads", filename)).catch(() => undefined)
+  await unlink(path.join(deps.config.dataDir, "uploads", filename)).catch(
+    () => undefined
+  )
 }
 
 export function createStatusPageRoutes(deps: AppDeps) {
@@ -53,7 +60,9 @@ export function createStatusPageRoutes(deps: AppDeps) {
           orderBy: asc(statusPageMonitors.sortOrder),
         }),
       ])
-      const order = new Map(selected.map((row) => [row.monitorId, row.sortOrder]))
+      const order = new Map(
+        selected.map((row) => [row.monitorId, row.sortOrder])
+      )
       return c.json({
         publicEnabled: appSettings.publicEnabled,
         publicShowResponseTime: appSettings.publicShowResponseTime,
@@ -81,7 +90,11 @@ export function createStatusPageRoutes(deps: AppDeps) {
           .from(monitors)
           .where(inArray(monitors.id, input.monitorIds))
         if (rows.length !== new Set(input.monitorIds).size) {
-          throw new ApiError(400, "INVALID_MONITOR_IDS", "公开页包含不存在的监视器")
+          throw new ApiError(
+            400,
+            "INVALID_MONITOR_IDS",
+            "公开页包含不存在的监视器"
+          )
         }
       }
       const now = deps.now?.() ?? new Date()
@@ -113,7 +126,11 @@ export function createStatusPageRoutes(deps: AppDeps) {
       const bytes = new Uint8Array(await file.arrayBuffer())
       const detected = imageType(bytes)
       if (!detected || file.type !== detected.mime) {
-        throw new ApiError(400, "INVALID_LOGO", "仅支持真实的 PNG、JPEG 或 WebP 文件")
+        throw new ApiError(
+          400,
+          "INVALID_LOGO",
+          "仅支持真实的 PNG、JPEG 或 WebP 文件"
+        )
       }
       const filename = `logo-${crypto.randomUUID()}.${detected.extension}`
       const destination = path.join(deps.config.dataDir, "uploads", filename)

@@ -7,7 +7,7 @@ export class ApiError extends Error {
     public readonly status: ContentfulStatusCode,
     public readonly code: string,
     message: string,
-    public readonly fields?: Record<string, string[] | undefined>,
+    public readonly fields?: Record<string, string[] | undefined>
   ) {
     super(message)
   }
@@ -18,9 +18,12 @@ export function jsonError(
   status: ContentfulStatusCode,
   code: string,
   message: string,
-  fields?: Record<string, string[] | undefined>,
+  fields?: Record<string, string[] | undefined>
 ) {
-  return c.json({ error: { code, message, ...(fields ? { fields } : {}) } }, status)
+  return c.json(
+    { error: { code, message, ...(fields ? { fields } : {}) } },
+    status
+  )
 }
 
 export function handleError(error: Error, c: Context, production: boolean) {

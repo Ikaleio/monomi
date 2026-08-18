@@ -4,7 +4,9 @@ import { defineConfig } from "vite"
 
 export default defineConfig({
   resolve: {
-    alias: [{ find: /^react-dom\/server$/, replacement: "react-dom/server.node" }],
+    alias: [
+      { find: /^react-dom\/server$/, replacement: "react-dom/server.node" },
+    ],
     tsconfigPaths: true,
   },
   server: {

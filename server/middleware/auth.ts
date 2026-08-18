@@ -12,7 +12,7 @@ const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000
 export async function sha256(value: string) {
   const digest = await crypto.subtle.digest(
     "SHA-256",
-    new TextEncoder().encode(value),
+    new TextEncoder().encode(value)
   )
   return Buffer.from(digest).toString("hex")
 }

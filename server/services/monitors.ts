@@ -15,7 +15,7 @@ const commonKeys = new Set([
 
 export function monitorConfig(input: MonitorInput) {
   return Object.fromEntries(
-    Object.entries(input).filter(([key]) => !commonKeys.has(key)),
+    Object.entries(input).filter(([key]) => !commonKeys.has(key))
   )
 }
 

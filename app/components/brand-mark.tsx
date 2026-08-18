@@ -32,7 +32,9 @@ export function BrandMark({
           <span className="truncate font-serif text-base font-semibold tracking-tight">
             {siteName}
           </span>
-          <span className="truncate text-xs text-muted-foreground">服务状态</span>
+          <span className="truncate text-xs text-muted-foreground">
+            服务状态
+          </span>
         </span>
       )}
     </Link>
