@@ -113,7 +113,7 @@ export function PublicStatusPage() {
   return (
     <main className="min-h-svh overflow-hidden bg-background">
       <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-3 py-4 md:px-8">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-3 py-3 md:px-6">
           <BrandMark logoPath={data.logoPath} siteName={data.siteName} />
           <div className="flex items-center gap-2">
             <UtilityMenus />
@@ -132,16 +132,16 @@ export function PublicStatusPage() {
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-6xl flex-col gap-12 px-3 py-8 md:gap-20 md:px-8 md:py-12">
+      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-3 py-4 md:gap-8 md:px-6 md:py-6">
         <motion.section
-          className="flex flex-col gap-7 md:gap-8"
+          className="flex flex-col gap-4 md:gap-5"
           initial="hidden"
           animate="visible"
           variants={staggerContainer}
         >
           <motion.div
             variants={staggerItem}
-            className="flex max-w-3xl flex-col gap-5"
+            className="flex max-w-3xl flex-col gap-3"
           >
             <Badge variant={status.variant}>
               <span
@@ -159,11 +159,11 @@ export function PublicStatusPage() {
           </motion.div>
           <motion.div
             variants={staggerItem}
-            className="flex flex-col justify-between gap-5 rounded-3xl bg-primary p-5 text-primary-foreground shadow-[0_30px_90px_-45px_var(--primary)] md:flex-row md:items-center md:gap-6 md:p-7"
+            className="flex flex-col justify-between gap-4 rounded-2xl bg-primary p-4 text-primary-foreground shadow-[0_30px_90px_-45px_var(--primary)] md:flex-row md:items-center md:gap-5 md:p-5"
           >
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <motion.span
-                className="flex size-12 items-center justify-center rounded-2xl bg-primary-foreground/15"
+                className="flex size-10 items-center justify-center rounded-xl bg-primary-foreground/15"
                 animate={{ scale: [1, 1.06, 1] }}
                 transition={{
                   duration: 2.8,
@@ -171,7 +171,7 @@ export function PublicStatusPage() {
                   ease: "easeInOut",
                 }}
               >
-                <StatusIcon className="size-6" aria-hidden="true" />
+                <StatusIcon className="size-5" aria-hidden="true" />
               </motion.span>
               <div className="flex flex-col gap-1">
                 <p className="font-serif text-2xl font-semibold">
@@ -193,10 +193,10 @@ export function PublicStatusPage() {
 
         <section
           aria-labelledby="monitors-title"
-          className="flex flex-col gap-6 md:gap-8"
+          className="flex flex-col gap-4 md:gap-5"
         >
           <Reveal>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
               <p className="text-sm font-medium text-primary">
                 {t("availability")}
               </p>
@@ -209,7 +209,7 @@ export function PublicStatusPage() {
             </div>
           </Reveal>
           {data.monitors.length === 0 ? (
-            <Empty className="min-h-48 border bg-card md:min-h-64">
+            <Empty className="min-h-36 border bg-card md:min-h-48">
               <EmptyHeader>
                 <EmptyTitle>尚未选择公开监视器</EmptyTitle>
                 <EmptyDescription>
@@ -218,7 +218,7 @@ export function PublicStatusPage() {
               </EmptyHeader>
             </Empty>
           ) : (
-            <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-3">
               {data.monitors.map((monitor, index) => (
                 <MonitorCard key={monitor.id} monitor={monitor} index={index} />
               ))}
@@ -228,11 +228,11 @@ export function PublicStatusPage() {
 
         <section
           aria-labelledby="incidents-title"
-          className="flex flex-col gap-6 md:gap-8"
+          className="flex flex-col gap-4 md:gap-5"
         >
           <Reveal>
             <div className="flex items-end justify-between gap-4">
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1">
                 <p className="text-sm font-medium text-primary">
                   {t("last90Days")}
                 </p>
@@ -249,7 +249,7 @@ export function PublicStatusPage() {
             </div>
           </Reveal>
           {data.incidents.length === 0 ? (
-            <Empty className="min-h-48 border bg-card md:min-h-64">
+            <Empty className="min-h-36 border bg-card md:min-h-48">
               <EmptyHeader>
                 <EmptyMedia variant="icon">
                   <CheckIcon aria-hidden="true" />
@@ -262,11 +262,11 @@ export function PublicStatusPage() {
             <div className="flex flex-col">
               {data.incidents.map((incident, index) => (
                 <Reveal key={incident.id} delay={index * 0.08}>
-                  <article className="grid gap-4 py-5 md:grid-cols-[12rem_1fr_auto] md:items-start md:py-7">
+                  <article className="grid gap-3 py-3 md:grid-cols-[11rem_1fr_auto] md:items-start md:py-4">
                     <time className="text-sm leading-relaxed text-muted-foreground">
                       {formatUpdatedAt(incident.startedAt, i18n.language)}
                     </time>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
                       <h3 className="font-serif text-xl font-semibold">
                         {incident.title}
                       </h3>
@@ -290,7 +290,7 @@ export function PublicStatusPage() {
         </section>
       </div>
       <footer className="border-t border-border/70">
-        <div className="mx-auto flex max-w-6xl flex-col justify-between gap-3 px-3 py-6 text-sm text-muted-foreground sm:flex-row sm:items-center md:px-8 md:py-8">
+        <div className="mx-auto flex max-w-6xl flex-col justify-between gap-2 px-3 py-4 text-sm text-muted-foreground sm:flex-row sm:items-center md:px-6 md:py-5">
           <span>
             © {new Date().getFullYear()} {data.siteName}
           </span>
@@ -303,11 +303,11 @@ export function PublicStatusPage() {
 
 function PublicLoading() {
   return (
-    <main className="mx-auto flex max-w-6xl flex-col gap-6 px-3 py-8 md:gap-8 md:px-8 md:py-12">
+    <main className="mx-auto flex max-w-6xl flex-col gap-4 px-3 py-6 md:gap-5 md:px-6 md:py-8">
       <Skeleton className="h-8 w-40" />
-      <Skeleton className="h-20 w-full max-w-2xl" />
-      <Skeleton className="h-52 w-full rounded-3xl" />
-      <Skeleton className="h-64 w-full rounded-2xl" />
+      <Skeleton className="h-16 w-full max-w-2xl" />
+      <Skeleton className="h-40 w-full rounded-2xl" />
+      <Skeleton className="h-48 w-full rounded-2xl" />
     </main>
   )
 }

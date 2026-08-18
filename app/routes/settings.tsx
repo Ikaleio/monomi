@@ -41,7 +41,7 @@ export default function SettingsRoute() {
   if (settings.isLoading)
     return (
       <main className="w-full px-3 py-6 md:px-8">
-        <Skeleton className="h-96 w-full" />
+        <Skeleton className="h-64 w-full" />
       </main>
     )
   if (settings.error || !settings.data)

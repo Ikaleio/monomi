@@ -51,7 +51,7 @@ export default function IncidentsRoute() {
         <ToggleGroupItem value="resolved">已解决</ToggleGroupItem>
       </ToggleGroup>
       {isLoading ? (
-        <Skeleton className="h-96 w-full" />
+        <Skeleton className="h-64 w-full" />
       ) : error || !data ? (
         <Alert variant="destructive">
           <AlertTitle>无法加载故障</AlertTitle>
@@ -69,7 +69,7 @@ export default function IncidentsRoute() {
           </CardHeader>
           <CardContent>
             {data.incidents.length === 0 ? (
-              <Empty className="min-h-64">
+              <Empty className="min-h-40">
                 <EmptyHeader>
                   <EmptyMedia variant="icon">✓</EmptyMedia>
                   <EmptyTitle>没有匹配的故障</EmptyTitle>
@@ -79,11 +79,11 @@ export default function IncidentsRoute() {
             ) : (
               <VirtualList
                 items={data.incidents}
-                estimateSize={104}
-                height={560}
+                estimateSize={80}
+                height={480}
                 getKey={(incident) => incident.id}
                 renderItem={(incident) => (
-                  <article className="grid h-full gap-3 border-b px-2 py-4 md:grid-cols-[10rem_1fr_auto] md:items-center">
+                  <article className="grid h-full gap-3 border-b px-2 py-3 md:grid-cols-[10rem_1fr_auto] md:items-center">
                     <time className="text-sm text-muted-foreground">
                       {new Date(incident.startedAt).toLocaleString("zh-CN")}
                     </time>

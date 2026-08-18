@@ -111,11 +111,11 @@ export function OverviewDashboard() {
         initial="hidden"
         animate="visible"
         variants={staggerContainer}
-        className="flex flex-col gap-7"
+        className="flex flex-col gap-5"
       >
         <motion.div
           variants={staggerItem}
-          className="flex flex-col justify-between gap-5 md:flex-row md:items-end"
+          className="flex flex-col justify-between gap-3 md:flex-row md:items-end"
         >
           <div className="flex max-w-2xl flex-col gap-2">
             <p className="text-sm font-medium text-primary">运行总览</p>
@@ -144,10 +144,10 @@ export function OverviewDashboard() {
         </motion.div>
         <motion.div
           variants={staggerItem}
-          className="grid overflow-hidden rounded-3xl bg-primary text-primary-foreground shadow-[0_28px_80px_-44px_var(--primary)] lg:grid-cols-[1.3fr_1fr]"
+          className="grid overflow-hidden rounded-2xl bg-primary text-primary-foreground shadow-[0_28px_80px_-44px_var(--primary)] lg:grid-cols-[1.3fr_1fr]"
         >
-          <div className="flex flex-col justify-between gap-6 p-5 md:gap-8 md:p-7">
-            <div className="flex items-start justify-between gap-6">
+          <div className="flex flex-col justify-between gap-4 p-4 md:gap-5 md:p-5">
+            <div className="flex items-start justify-between gap-4">
               <div className="flex flex-col gap-2">
                 <span className="text-sm text-primary-foreground/70">
                   全局服务状态
@@ -156,12 +156,12 @@ export function OverviewDashboard() {
                   {statusText[data.globalStatus]}
                 </h2>
               </div>
-              <span className="flex size-12 items-center justify-center rounded-2xl bg-primary-foreground/15">
-                <ActivityIcon className="size-6" aria-hidden="true" />
+              <span className="flex size-10 items-center justify-center rounded-xl bg-primary-foreground/15">
+                <ActivityIcon className="size-5" aria-hidden="true" />
               </span>
             </div>
             <div className="flex items-end gap-3">
-              <span className="font-serif text-6xl font-semibold tracking-tight tabular-nums md:text-7xl">
+              <span className="font-serif text-5xl font-semibold tracking-tight tabular-nums md:text-6xl">
                 {data.uptime24h == null ? "—" : data.uptime24h.toFixed(2)}
               </span>
               <span className="pb-2 text-lg text-primary-foreground/75">%</span>
@@ -183,7 +183,7 @@ export function OverviewDashboard() {
             ].map(([label, value, suffix], index) => (
               <motion.div
                 key={label}
-                className={`flex min-h-32 flex-col justify-between border-primary-foreground/15 p-5 odd:border-r md:p-6 ${index < 2 ? "border-b" : ""}`}
+                className={`flex min-h-24 flex-col justify-between border-primary-foreground/15 p-4 odd:border-r md:min-h-28 md:p-5 ${index < 2 ? "border-b" : ""}`}
                 initial={{ opacity: 0, scale: 0.94 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{
@@ -208,14 +208,14 @@ export function OverviewDashboard() {
         </motion.div>
       </motion.section>
 
-      <section aria-labelledby="stats-title" className="flex flex-col gap-5">
+      <section aria-labelledby="stats-title" className="flex flex-col gap-4">
         <Reveal>
           <h2 id="stats-title" className="font-serif text-2xl font-semibold">
             核心统计
           </h2>
         </Reveal>
         <motion.div
-          className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+          className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
@@ -248,7 +248,7 @@ export function OverviewDashboard() {
 
       <section
         aria-labelledby="monitor-summary-title"
-        className="grid gap-6 xl:grid-cols-[1.35fr_1fr]"
+        className="grid gap-4 xl:grid-cols-[1.35fr_1fr]"
       >
         <Reveal className="min-w-0">
           <Card className="h-full">
@@ -274,7 +274,7 @@ export function OverviewDashboard() {
             </CardHeader>
             <CardContent>
               {data.monitors.length === 0 ? (
-                <Empty className="min-h-56">
+                <Empty className="min-h-40">
                   <EmptyHeader>
                     <EmptyMedia variant="icon">
                       <ServerIcon aria-hidden="true" />
@@ -288,13 +288,13 @@ export function OverviewDashboard() {
               ) : (
                 <VirtualList
                   items={data.monitors}
-                  estimateSize={72}
+                  estimateSize={64}
                   getKey={(item) => item.id}
                   renderItem={(monitor, index) => (
                     <div className="px-1">
                       <Link
                         to={`/app/monitors/${monitor.id}`}
-                        className="flex items-center justify-between gap-4 rounded-xl py-4 outline-none hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring"
+                        className="flex items-center justify-between gap-4 rounded-xl py-3 outline-none hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         <div className="flex min-w-0 items-center gap-3">
                           <span
@@ -335,7 +335,7 @@ export function OverviewDashboard() {
             </CardHeader>
             <CardContent>
               {data.attention.length === 0 ? (
-                <Empty className="min-h-56">
+                <Empty className="min-h-40">
                   <EmptyHeader>
                     <EmptyMedia variant="icon">
                       <CheckCircle2Icon aria-hidden="true" />
@@ -349,12 +349,12 @@ export function OverviewDashboard() {
               ) : (
                 <VirtualList
                   items={data.attention}
-                  estimateSize={86}
+                  estimateSize={72}
                   getKey={(item) => item.id}
                   renderItem={(item, index) => (
                     <div className="px-1">
-                      <article className="flex items-start gap-3 py-4">
-                        <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-destructive/10 text-destructive">
+                      <article className="flex items-start gap-3 py-3">
+                        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
                           <AlertTriangleIcon
                             className="size-4"
                             aria-hidden="true"
@@ -386,10 +386,10 @@ function OverviewSkeleton() {
   return (
     <main className="flex w-full flex-col gap-6 px-3 py-6 md:px-8">
       <Skeleton className="h-20 w-2/3" />
-      <Skeleton className="h-72 w-full rounded-3xl" />
-      <div className="grid gap-4 md:grid-cols-4">
+      <Skeleton className="h-56 w-full rounded-2xl" />
+      <div className="grid gap-3 md:grid-cols-4">
         {Array.from({ length: 4 }, (_, index) => (
-          <Skeleton key={index} className="h-36" />
+          <Skeleton key={index} className="h-28" />
         ))}
       </div>
     </main>

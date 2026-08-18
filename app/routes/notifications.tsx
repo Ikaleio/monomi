@@ -64,7 +64,7 @@ export default function NotificationsRoute() {
   if (isLoading)
     return (
       <main className="w-full px-3 py-6 md:px-8">
-        <Skeleton className="h-96 w-full" />
+        <Skeleton className="h-64 w-full" />
       </main>
     )
   if (error || !data)
@@ -233,14 +233,14 @@ export default function NotificationsRoute() {
         </CardHeader>
         <CardContent>
           {data.channels.length === 0 ? (
-            <p className="py-12 text-center text-muted-foreground">
+            <p className="py-8 text-center text-muted-foreground">
               还没有通知渠道。
             </p>
           ) : (
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2">
               {data.channels.map((channel) => (
                 <div
-                  className="flex flex-col justify-between gap-3 rounded-xl border p-4 sm:flex-row sm:items-center"
+                  className="flex flex-col justify-between gap-2 rounded-lg border p-3 sm:flex-row sm:items-center"
                   key={channel.id}
                 >
                   <div className="flex min-w-0 flex-col gap-1">
@@ -283,7 +283,7 @@ export default function NotificationsRoute() {
           {data.deliveries.length ? (
             <VirtualList
               items={data.deliveries}
-              estimateSize={60}
+              estimateSize={52}
               getKey={(delivery) => delivery.id}
               renderItem={(delivery) => (
                 <div className="grid h-full grid-cols-3 items-center border-b px-2 text-sm">
@@ -306,7 +306,7 @@ export default function NotificationsRoute() {
               )}
             />
           ) : (
-            <p className="py-12 text-center text-muted-foreground">
+            <p className="py-8 text-center text-muted-foreground">
               暂无发送记录。
             </p>
           )}

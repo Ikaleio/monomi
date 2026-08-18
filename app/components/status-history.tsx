@@ -49,9 +49,9 @@ export function StatusHistory({
 }) {
   const { t, i18n } = useTranslation()
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
       <div
-        className="overflow-x-auto pb-2"
+        className="overflow-x-auto pb-1"
         aria-label={`${label} 最近 90 天状态`}
       >
         <div className="flex min-w-3xl gap-1">
@@ -62,7 +62,7 @@ export function StatusHistory({
                   type="button"
                   aria-label={`${formatPublicDate(day.date, i18n.language)}，${t(statusLabels[day.status])}，${day.uptime == null ? t("noData") : `${day.uptime.toFixed(2)}%`}`}
                   className={cn(
-                    "h-9 min-w-1 flex-1 rounded-sm ring-offset-background transition-opacity outline-none hover:opacity-70 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                    "h-7 min-w-1 flex-1 rounded-sm ring-offset-background transition-opacity outline-none hover:opacity-70 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                     cellClasses[day.status]
                   )}
                   initial={{ opacity: 0, scaleY: 0.2 }}

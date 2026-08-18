@@ -43,7 +43,7 @@ export default function StatusPageSettingsRoute() {
   if (isLoading)
     return (
       <main className="w-full px-3 py-6 md:px-8">
-        <Skeleton className="h-96 w-full" />
+        <Skeleton className="h-64 w-full" />
       </main>
     )
   if (error || !data)
@@ -206,7 +206,7 @@ export default function StatusPageSettingsRoute() {
             只接受不超过 2 MiB 的 PNG、JPEG 或 WebP。
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col gap-4">
+        <CardContent className="flex flex-col gap-3">
           <Field>
             <FieldLabel htmlFor="logo">上传 Logo</FieldLabel>
             <input

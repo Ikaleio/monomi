@@ -57,7 +57,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider>
       <Sidebar collapsible="icon">
-        <SidebarHeader className="h-16 justify-center border-b border-sidebar-border px-3">
+        <SidebarHeader className="h-14 justify-center border-b border-sidebar-border px-3">
           <SidebarBrand />
         </SidebarHeader>
         <SidebarContent>
@@ -98,7 +98,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         <SidebarRail />
       </Sidebar>
       <SidebarInset className="min-w-0 bg-muted/45">
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border/70 bg-background/90 px-3 backdrop-blur-xl md:px-7">
+        <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border/70 bg-background/90 px-3 backdrop-blur-xl md:px-6">
           <div className="flex items-center gap-3">
             <SidebarTrigger aria-label={t("runtimeCenter")} />
             <span className="text-sm font-medium">{t(activeItem.key)}</span>

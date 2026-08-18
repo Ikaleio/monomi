@@ -78,7 +78,7 @@ export default function SetupRoute() {
 
   return (
     <main className="flex min-h-svh items-center justify-center bg-muted/45 px-3 py-5">
-      <div className="flex w-full max-w-lg flex-col gap-6">
+      <div className="flex w-full max-w-lg flex-col gap-4">
         <BrandMark />
         <Card>
           <CardHeader>

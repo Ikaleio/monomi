@@ -115,7 +115,7 @@ export function MonitorForm({
 
   const headers = form.type === "http" ? Object.entries(form.headers) : []
   return (
-    <form onSubmit={submit} className="flex max-w-3xl flex-col gap-6 md:gap-8">
+    <form onSubmit={submit} className="flex max-w-3xl flex-col gap-4 md:gap-5">
       <FieldGroup>
         {error && (
           <Field data-invalid>
