@@ -32,7 +32,7 @@ export default function IncidentsRoute() {
     filter === "all" ? undefined : filter
   )
   return (
-    <main className="mx-auto flex max-w-7xl flex-col gap-5 px-3 py-6 md:gap-6 md:px-8 md:py-8">
+    <main className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-3 py-4 md:gap-5 md:px-6 md:py-6">
       <div className="flex flex-col gap-2">
         <p className="text-sm font-medium text-primary">事件</p>
         <h1 className="font-serif text-4xl font-semibold">故障记录</h1>
@@ -51,7 +51,7 @@ export default function IncidentsRoute() {
         <ToggleGroupItem value="resolved">已解决</ToggleGroupItem>
       </ToggleGroup>
       {isLoading ? (
-        <Skeleton className="h-96 w-full" />
+        <Skeleton className="h-64 w-full" />
       ) : error || !data ? (
         <Alert variant="destructive">
           <AlertTitle>无法加载故障</AlertTitle>
@@ -69,7 +69,7 @@ export default function IncidentsRoute() {
           </CardHeader>
           <CardContent>
             {data.incidents.length === 0 ? (
-              <Empty className="min-h-64">
+              <Empty className="min-h-40">
                 <EmptyHeader>
                   <EmptyMedia variant="icon">✓</EmptyMedia>
                   <EmptyTitle>没有匹配的故障</EmptyTitle>
@@ -79,11 +79,11 @@ export default function IncidentsRoute() {
             ) : (
               <VirtualList
                 items={data.incidents}
-                estimateSize={104}
-                height={560}
+                estimateSize={80}
+                height={480}
                 getKey={(incident) => incident.id}
                 renderItem={(incident) => (
-                  <article className="grid h-full gap-3 border-b px-2 py-4 md:grid-cols-[10rem_1fr_auto] md:items-center">
+                  <article className="grid h-full gap-3 border-b px-2 py-3 md:grid-cols-[10rem_1fr_auto] md:items-center">
                     <time className="text-sm text-muted-foreground">
                       {new Date(incident.startedAt).toLocaleString("zh-CN")}
                     </time>

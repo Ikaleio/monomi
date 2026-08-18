@@ -42,13 +42,13 @@ export default function StatusPageSettingsRoute() {
   const [order, setOrder] = useState<string[] | null>(null)
   if (isLoading)
     return (
-      <main className="mx-auto max-w-5xl px-3 py-6 md:px-8">
-        <Skeleton className="h-96 w-full" />
+      <main className="mx-auto w-full max-w-5xl px-3 py-4 md:px-6 md:py-5">
+        <Skeleton className="h-64 w-full" />
       </main>
     )
   if (error || !data)
     return (
-      <main className="mx-auto max-w-5xl px-3 py-6 md:px-8">
+      <main className="mx-auto w-full max-w-5xl px-3 py-4 md:px-6 md:py-5">
         <Alert variant="destructive">
           <AlertTitle>无法加载状态页设置</AlertTitle>
           <AlertDescription>
@@ -111,7 +111,7 @@ export default function StatusPageSettingsRoute() {
     setOrder(next)
   }
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-6 px-3 py-6 md:gap-7 md:px-8 md:py-8">
+    <main className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-3 py-4 md:gap-5 md:px-6 md:py-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div className="flex flex-col gap-2">
           <p className="text-sm font-medium text-primary">{`Monomi`}</p>
@@ -206,7 +206,7 @@ export default function StatusPageSettingsRoute() {
             只接受不超过 2 MiB 的 PNG、JPEG 或 WebP。
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-col gap-4">
+        <CardContent className="flex flex-col gap-3">
           <Field>
             <FieldLabel htmlFor="logo">上传 Logo</FieldLabel>
             <input

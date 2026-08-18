@@ -39,7 +39,7 @@ export default function MonitorNewRoute() {
   }
 
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-6 px-3 py-6 md:gap-7 md:px-8 md:py-8">
+    <main className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-3 py-4 md:gap-5 md:px-6 md:py-6">
       <div className="flex flex-col gap-2">
         <p className="text-sm font-medium text-primary">监视器</p>
         <h1 className="font-serif text-4xl font-semibold">新建监视器</h1>

@@ -39,13 +39,13 @@ export default function MonitorsRoute() {
   const { data, error, isLoading } = useMonitors()
   if (isLoading)
     return (
-      <main className="mx-auto max-w-7xl px-3 py-6 md:px-8">
+      <main className="mx-auto w-full max-w-7xl px-3 py-4 md:px-6 md:py-5">
         <Skeleton className="h-64 w-full" />
       </main>
     )
   if (error || !data)
     return (
-      <main className="mx-auto max-w-7xl px-3 py-6 md:px-8">
+      <main className="mx-auto w-full max-w-7xl px-3 py-4 md:px-6 md:py-5">
         <Alert variant="destructive">
           <AlertTitle>无法加载监视器</AlertTitle>
           <AlertDescription>
@@ -55,7 +55,7 @@ export default function MonitorsRoute() {
       </main>
     )
   return (
-    <main className="mx-auto flex max-w-7xl flex-col gap-5 px-3 py-6 md:gap-6 md:px-8 md:py-8">
+    <main className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-3 py-4 md:gap-5 md:px-6 md:py-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div className="flex flex-col gap-2">
           <p className="text-sm font-medium text-primary">运行中心</p>
@@ -75,7 +75,7 @@ export default function MonitorsRoute() {
         </CardHeader>
         <CardContent>
           {data.monitors.length === 0 ? (
-            <Empty className="min-h-64">
+            <Empty className="min-h-40">
               <EmptyHeader>
                 <EmptyMedia variant="icon">＋</EmptyMedia>
                 <EmptyTitle>还没有监视器</EmptyTitle>
@@ -88,12 +88,12 @@ export default function MonitorsRoute() {
           ) : (
             <VirtualList
               items={data.monitors}
-              estimateSize={76}
+              estimateSize={60}
               getKey={(monitor) => monitor.id}
               renderItem={(monitor) => (
                 <Link
                   to={`/app/monitors/${monitor.id}`}
-                  className="flex items-center justify-between gap-4 rounded-xl px-3 py-4 outline-none hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring"
+                  className="flex items-center justify-between gap-3 rounded-lg px-2 py-3 outline-none hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <div className="flex min-w-0 items-center gap-3">
                     <span

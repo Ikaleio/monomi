@@ -21,13 +21,13 @@ export default function MonitorEditRoute() {
   const [pending, setPending] = useState(false)
   if (!data && !error)
     return (
-      <main className="mx-auto max-w-5xl px-3 py-6 md:px-8">
-        <Skeleton className="h-96 w-full" />
+      <main className="mx-auto w-full max-w-5xl px-3 py-4 md:px-6 md:py-5">
+        <Skeleton className="h-64 w-full" />
       </main>
     )
   if (error || !data)
     return (
-      <main className="mx-auto max-w-5xl px-3 py-6 md:px-8">
+      <main className="mx-auto w-full max-w-5xl px-3 py-4 md:px-6 md:py-5">
         <Alert variant="destructive">
           <AlertTitle>无法加载监视器</AlertTitle>
           <AlertDescription>
@@ -56,7 +56,7 @@ export default function MonitorEditRoute() {
     }
   }
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-6 px-3 py-6 md:gap-7 md:px-8 md:py-8">
+    <main className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-3 py-4 md:gap-5 md:px-6 md:py-6">
       <div className="flex flex-col gap-2">
         <p className="text-sm font-medium text-primary">监视器</p>
         <h1 className="font-serif text-4xl font-semibold">

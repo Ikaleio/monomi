@@ -59,13 +59,13 @@ export default function MonitorDetailRoute() {
   const [pending, setPending] = useState(false)
   if (!monitorQuery.data && !monitorQuery.error)
     return (
-      <main className="mx-auto max-w-7xl px-3 py-6 md:px-8">
-        <Skeleton className="h-96 w-full" />
+      <main className="mx-auto w-full max-w-7xl px-3 py-4 md:px-6 md:py-5">
+        <Skeleton className="h-64 w-full" />
       </main>
     )
   if (monitorQuery.error || !monitorQuery.data || !monitorId)
     return (
-      <main className="mx-auto max-w-7xl px-3 py-6 md:px-8">
+      <main className="mx-auto w-full max-w-7xl px-3 py-4 md:px-6 md:py-5">
         <Alert variant="destructive">
           <AlertTitle>无法加载监视器</AlertTitle>
           <AlertDescription>
@@ -143,8 +143,8 @@ export default function MonitorDetailRoute() {
   const buckets = activityQuery.data?.metrics.buckets ?? []
   const history = activityQuery.data?.history.history ?? []
   return (
-    <main className="mx-auto flex max-w-7xl flex-col gap-6 px-3 py-6 md:gap-7 md:px-8 md:py-8">
-      <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+    <main className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-3 py-4 md:gap-5 md:px-6 md:py-6">
+      <div className="flex flex-col justify-between gap-3 md:flex-row md:items-end">
         <div className="flex flex-col gap-2">
           <p className="text-sm font-medium text-primary">
             {monitor.type.toUpperCase()}
@@ -218,7 +218,7 @@ export default function MonitorDetailRoute() {
               地址只在创建或重新生成时显示一次。
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col gap-4">
+          <CardContent className="flex flex-col gap-3">
             {heartbeatUrl && (
               <Alert>
                 <AlertTitle>新的 Heartbeat 地址</AlertTitle>
@@ -238,7 +238,7 @@ export default function MonitorDetailRoute() {
           </CardContent>
         </Card>
       )}
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid gap-4 xl:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle className="font-serif text-2xl">24 小时延迟</CardTitle>
@@ -247,7 +247,7 @@ export default function MonitorDetailRoute() {
           <CardContent>
             {buckets.length ? (
               <ChartContainer
-                className="h-72 w-full"
+                className="h-56 w-full"
                 config={{
                   latencyMs: { label: "延迟", color: "var(--chart-1)" },
                 }}
@@ -273,7 +273,7 @@ export default function MonitorDetailRoute() {
                 </LineChart>
               </ChartContainer>
             ) : (
-              <p className="py-20 text-center text-muted-foreground">
+              <p className="py-12 text-center text-muted-foreground">
                 暂无延迟数据
               </p>
             )}
@@ -288,7 +288,7 @@ export default function MonitorDetailRoute() {
             {history.length ? (
               <StatusHistory history={history} label={monitor.name} />
             ) : (
-              <p className="py-20 text-center text-muted-foreground">
+              <p className="py-12 text-center text-muted-foreground">
                 暂无历史
               </p>
             )}
@@ -316,8 +316,8 @@ export default function MonitorDetailRoute() {
           {checks.length ? (
             <VirtualList
               items={checks}
-              estimateSize={52}
-              height={420}
+              estimateSize={48}
+              height={360}
               getKey={(check) => check.id}
               renderItem={(check) => (
                 <div className="grid h-full grid-cols-4 items-center border-b px-2 text-sm">
@@ -335,7 +335,7 @@ export default function MonitorDetailRoute() {
               )}
             />
           ) : (
-            <p className="py-12 text-center text-muted-foreground">
+            <p className="py-8 text-center text-muted-foreground">
               暂无检查记录
             </p>
           )}

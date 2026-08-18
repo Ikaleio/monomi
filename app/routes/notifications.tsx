@@ -63,13 +63,13 @@ export default function NotificationsRoute() {
   const [saving, setSaving] = useState(false)
   if (isLoading)
     return (
-      <main className="mx-auto max-w-7xl px-3 py-6 md:px-8">
-        <Skeleton className="h-96 w-full" />
+      <main className="mx-auto w-full max-w-7xl px-3 py-4 md:px-6 md:py-5">
+        <Skeleton className="h-64 w-full" />
       </main>
     )
   if (error || !data)
     return (
-      <main className="mx-auto max-w-7xl px-3 py-6 md:px-8">
+      <main className="mx-auto w-full max-w-7xl px-3 py-4 md:px-6 md:py-5">
         <Alert variant="destructive">
           <AlertTitle>无法加载通知</AlertTitle>
           <AlertDescription>
@@ -122,7 +122,7 @@ export default function NotificationsRoute() {
     await mutate("notifications")
   }
   return (
-    <main className="mx-auto flex max-w-7xl flex-col gap-5 px-3 py-6 md:gap-6 md:px-8 md:py-8">
+    <main className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-3 py-4 md:gap-5 md:px-6 md:py-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div className="flex flex-col gap-2">
           <p className="text-sm font-medium text-primary">运行中心</p>
@@ -233,14 +233,14 @@ export default function NotificationsRoute() {
         </CardHeader>
         <CardContent>
           {data.channels.length === 0 ? (
-            <p className="py-12 text-center text-muted-foreground">
+            <p className="py-8 text-center text-muted-foreground">
               还没有通知渠道。
             </p>
           ) : (
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2">
               {data.channels.map((channel) => (
                 <div
-                  className="flex flex-col justify-between gap-3 rounded-xl border p-4 sm:flex-row sm:items-center"
+                  className="flex flex-col justify-between gap-2 rounded-lg border p-3 sm:flex-row sm:items-center"
                   key={channel.id}
                 >
                   <div className="flex min-w-0 flex-col gap-1">
@@ -283,7 +283,7 @@ export default function NotificationsRoute() {
           {data.deliveries.length ? (
             <VirtualList
               items={data.deliveries}
-              estimateSize={60}
+              estimateSize={52}
               getKey={(delivery) => delivery.id}
               renderItem={(delivery) => (
                 <div className="grid h-full grid-cols-3 items-center border-b px-2 text-sm">
@@ -306,7 +306,7 @@ export default function NotificationsRoute() {
               )}
             />
           ) : (
-            <p className="py-12 text-center text-muted-foreground">
+            <p className="py-8 text-center text-muted-foreground">
               暂无发送记录。
             </p>
           )}

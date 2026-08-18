@@ -87,8 +87,8 @@ export function MonitorCard({
             </Badge>
           </CardAction>
         </CardHeader>
-        <CardContent className="flex flex-col gap-6">
-          <dl className="grid grid-cols-3 gap-2 rounded-2xl bg-muted/65 p-3 md:gap-3 md:p-4">
+        <CardContent className="flex flex-col gap-4">
+          <dl className="grid grid-cols-3 gap-2 rounded-xl bg-muted/65 p-2 md:p-3">
             {values.map(([label, value]) => (
               <div key={label} className="flex min-w-0 flex-col gap-1">
                 <dt className="truncate text-xs text-muted-foreground">
