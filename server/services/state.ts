@@ -14,7 +14,10 @@ import {
 import { ApiError } from "../http/errors"
 import type { AppDatabase } from "../http/types"
 
-type RecordOptions = { heartbeat?: boolean }
+type RecordOptions = {
+  heartbeat?: boolean
+  nextCheckAt?: Date | null
+}
 
 export function recordOutcome(
   db: AppDatabase,
@@ -134,6 +137,9 @@ export function recordOutcome(
         lastCheckAt: now,
         lastSuccessAt: outcome.success ? now : monitor.lastSuccessAt,
         ...(options.heartbeat ? { lastHeartbeatAt: now } : {}),
+        ...(options.nextCheckAt !== undefined
+          ? { nextCheckAt: options.nextCheckAt }
+          : {}),
         updatedAt: now,
       })
       .where(eq(monitors.id, monitorId))

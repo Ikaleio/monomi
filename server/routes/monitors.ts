@@ -34,20 +34,6 @@ async function parseJson(c: { req: { json(): Promise<unknown> } }) {
   }
 }
 
-async function resolveIncident(
-  deps: AppDeps,
-  monitorId: string,
-  resolution: string
-) {
-  const now = deps.now?.() ?? new Date()
-  await deps.db
-    .update(incidents)
-    .set({ status: "resolved", resolvedAt: now, resolution })
-    .where(
-      and(eq(incidents.monitorId, monitorId), eq(incidents.status, "ongoing"))
-    )
-}
-
 export function createMonitorRoutes(deps: AppDeps) {
   return new Hono<AppEnv>()
     .get("/", async (c) => {
@@ -126,28 +112,38 @@ export function createMonitorRoutes(deps: AppDeps) {
         nextCheckAt = now
         consecutiveFailures = 0
       }
-      await deps.db
-        .update(monitors)
-        .set({
-          name: input.name,
-          description: input.description,
-          configJson: JSON.stringify(monitorConfig(input)),
-          intervalSeconds: input.intervalSeconds,
-          timeoutMs: input.timeoutMs,
-          failureThreshold: input.failureThreshold,
-          latencyThresholdMs: input.latencyThresholdMs ?? null,
-          enabled: input.enabled,
-          status,
-          nextCheckAt,
-          consecutiveFailures,
-          updatedAt: now,
-        })
-        .where(eq(monitors.id, id))
-      if (checkConfigChanged) {
-        await resolveIncident(deps, id, "监视器配置已更新")
-      } else if (!input.enabled && enabledChanged) {
-        await resolveIncident(deps, id, "监视器已暂停")
-      }
+      const resolution = checkConfigChanged
+        ? "监视器配置已更新"
+        : !input.enabled && enabledChanged
+          ? "监视器已暂停"
+          : null
+      deps.db.transaction((tx) => {
+        tx.update(monitors)
+          .set({
+            name: input.name,
+            description: input.description,
+            configJson: JSON.stringify(monitorConfig(input)),
+            intervalSeconds: input.intervalSeconds,
+            timeoutMs: input.timeoutMs,
+            failureThreshold: input.failureThreshold,
+            latencyThresholdMs: input.latencyThresholdMs ?? null,
+            enabled: input.enabled,
+            status,
+            nextCheckAt,
+            consecutiveFailures,
+            updatedAt: now,
+          })
+          .where(eq(monitors.id, id))
+          .run()
+        if (resolution) {
+          tx.update(incidents)
+            .set({ status: "resolved", resolvedAt: now, resolution })
+            .where(
+              and(eq(incidents.monitorId, id), eq(incidents.status, "ongoing"))
+            )
+            .run()
+        }
+      })
       return c.json({ monitor: monitorView(await getMonitor(deps, id)) })
     })
     .delete("/:id", async (c) => {
