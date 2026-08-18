@@ -112,17 +112,12 @@ export class MonitorScheduler implements SchedulerLike {
       throw new ApiError(400, "NOT_HEARTBEAT_MONITOR", "该监视器不是 Heartbeat")
     }
     const outcome: CheckOutcome = { success: true, latencyMs: 0 }
-    recordOutcome(this.db, monitorId, outcome, now, { heartbeat: true })
-    this.db
-      .update(monitors)
-      .set({
-        nextCheckAt: new Date(
-          now.getTime() + (input.intervalSeconds + input.graceSeconds) * 1000
-        ),
-        updatedAt: now,
-      })
-      .where(eq(monitors.id, monitorId))
-      .run()
+    recordOutcome(this.db, monitorId, outcome, now, {
+      heartbeat: true,
+      nextCheckAt: new Date(
+        now.getTime() + (input.intervalSeconds + input.graceSeconds) * 1000
+      ),
+    })
     return outcome
   }
 
@@ -138,7 +133,18 @@ export class MonitorScheduler implements SchedulerLike {
 
   private async perform(monitor: MonitorRow, now: Date) {
     const controller = new AbortController()
-    const outcome = await this.checker(monitor, controller.signal, now)
+    let outcome: CheckOutcome
+    try {
+      outcome = await this.checker(monitor, controller.signal, now)
+    } catch (error) {
+      outcome = {
+        success: false,
+        latencyMs: 0,
+        errorCode: "UNKNOWN_ERROR",
+        errorMessage:
+          error instanceof Error ? error.message.slice(0, 500) : "检测器异常",
+      }
+    }
     recordOutcome(this.db, monitor.id, outcome, now)
 
     if (
@@ -147,14 +153,21 @@ export class MonitorScheduler implements SchedulerLike {
       (!monitor.certificateCheckedAt ||
         now.getTime() - monitor.certificateCheckedAt.getTime() >= 86400000)
     ) {
-      const input = monitorInputFromRow(monitor)
-      if (input.type === "http" && new URL(input.url).protocol === "https:") {
-        const certificate = await checkCertificate(input)
-        recordCertificate(
-          this.db,
-          monitor.id,
-          certificate.success ? certificate.expiresAt : null,
-          now
+      try {
+        const input = monitorInputFromRow(monitor)
+        if (input.type === "http" && new URL(input.url).protocol === "https:") {
+          const certificate = await checkCertificate(input)
+          recordCertificate(
+            this.db,
+            monitor.id,
+            certificate.success ? certificate.expiresAt : null,
+            now
+          )
+        }
+      } catch (error) {
+        console.error(
+          "Certificate check failed:",
+          error instanceof Error ? error.message : "unknown error"
         )
       }
     }

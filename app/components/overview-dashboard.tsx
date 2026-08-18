@@ -63,7 +63,7 @@ export function OverviewDashboard() {
   if (isLoading) return <OverviewSkeleton />
   if (error || !data)
     return (
-      <main className="mx-auto w-full max-w-7xl px-3 py-4 md:px-6 md:py-5">
+      <main className="w-full px-3 py-6 md:px-8">
         <Alert variant="destructive">
           <AlertTriangleIcon aria-hidden="true" />
           <AlertTitle>总览暂时不可用</AlertTitle>
@@ -106,7 +106,7 @@ export function OverviewDashboard() {
     },
   ]
   return (
-    <main className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-3 py-4 md:gap-6 md:px-6 md:py-6">
+    <main className="flex w-full flex-col gap-7 px-3 py-6 md:gap-8 md:px-8 md:py-8">
       <motion.section
         initial="hidden"
         animate="visible"
@@ -384,7 +384,7 @@ export function OverviewDashboard() {
 
 function OverviewSkeleton() {
   return (
-    <main className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-3 py-4 md:px-6 md:py-5">
+    <main className="flex w-full flex-col gap-6 px-3 py-6 md:px-8">
       <Skeleton className="h-20 w-2/3" />
       <Skeleton className="h-56 w-full rounded-2xl" />
       <div className="grid gap-3 md:grid-cols-4">
